@@ -1,7 +1,11 @@
 /**
  * app.js
- * Handles translations, rendering of theory, traps, summary, warm-up exercises,
- * and handles exam loading, grading with only 4 focused options per question.
+ * Logic for Multilingual Prepositions Review & Training.
+ * Features:
+ *  - Instant color marking on practice exercises (Green = correct, Orange = wrong).
+ *  - Neutral selection on exams (no colors until submission).
+ *  - Random sampling of 15 questions from the large question pool on every exam attempt.
+ *  - Full 7-language support, including the new preposition "TO".
  */
 
 const I18N = {
@@ -11,19 +15,20 @@ const I18N = {
       modalTitle: "English Prepositions: Review & Training",
       modalSub: "Select your reference language for explanations and feedback:",
       title: "Prepositions Review & Training",
-      intro: "A targeted guide designed for ESL students to master essential English prepositions. Review beginner foundations (at, on, in, for), master time structures (before, after, during, while, since, until), and test your knowledge across 4 progressive level exams.",
-      nav: ["Theory", "Common Traps", "Quick Summary", "Warm-up", "Level Exams"],
+      intro: "A targeted guide designed for ESL students to master essential English prepositions. Review beginner foundations (to, at, on, in, for), master time structures (before, after, during, while, since, until), and test your knowledge across 4 progressive level exams with randomized questions.",
+      nav: ["Theory", "Common Traps", "Quick Summary", "Practice", "Level Exams"],
       sec1Title: "1. Theory & Core Rules",
-      sec1Lead: "Mastering prepositions is all about identifying whether they are followed by specific clock times, calendar days, general periods, isolated nouns, or full clauses.",
+      sec1Lead: "Mastering prepositions is all about identifying whether they express movement/destination, clock times, calendar days, general periods, isolated nouns, or full clauses.",
       secTrapsTitle: "⚠️ 4 Critical Traps to Avoid",
       secTrapsLead: "The four most frequent pitfalls English learners face and how to bypass them:",
       sec2Title: "2. Quick Summary Table",
-      sec3Title: "3. Warm-up Exercises",
-      sec3Lead: "Choose the correct preposition in each sentence and click 'Check Answers'. Practice until you feel confident.",
-      sec4Title: "4. Final Level Exams (60 Questions Total)",
-      sec4Lead: "Choose an exam level below. Each exam features 15 distinct questions with automatic grading and detailed error feedback.",
+      sec3Title: "3. Practice Exercises (Instant Feedback)",
+      sec3Lead: "Choose a preposition in each sentence. It will turn GREEN if correct and ORANGE if wrong instantly. Practice until confident!",
+      sec4Title: "4. Final Level Exams (Randomized Pool)",
+      sec4Lead: "Choose an exam level below. Each exam dynamically selects 15 random questions from our question pool. Colors remain neutral until you submit for your final score.",
       tableHeaders: ["Preposition", "Main Use", "Structure / Followed by", "Example"],
       tableRows: [
+        ["to", "Destination, movement & direction", "Place, person, or goal", "go to school / walk to the park / talk to me"],
         ["at", "Specific clock times & exact points", "Exact time / specific spot", "at 5:00 PM / at the bus stop / at night"],
         ["on", "Days, dates & surfaces", "Day of the week / specific date", "on Monday / on October 21st / on the desk"],
         ["in", "Months, years, seasons & enclosed spaces", "Larger periods / spaces", "in July / in 2026 / in Canada / in the room"],
@@ -35,16 +40,15 @@ const I18N = {
         ["since", "From a past starting point", "specific starting point in past", "since 2020 / since Monday / since I moved"],
         ["until", "Continuing up to a point", "terminal time or clause", "until 6:00 PM / until you come back"]
       ],
-      quickTip: "<b>Memory Rule (Pyramid of At, On, In):</b> <b>IN</b> is big (year, month, country). <b>ON</b> is smaller (specific day, date, street). <b>AT</b> is exact (precise hour, exact address).",
+      quickTip: "<b>Memory Rule (Destination vs. Location):</b> Use <b>TO</b> for movement toward a destination (<i>I go to school</i>). Use <b>AT</b> for a static exact point (<i>I am at school</i>) and <b>IN</b> for inside a city or country (<i>I am in Canada</i>).",
       tipLabel: "Pro Tip:",
-      btnCheck: "Check Answers",
-      btnReset: "Reset",
+      btnResetPractice: "Reset Practice",
       btnSubmitExam: "Submit Exam & See Score",
-      btnRetryExam: "Reset Answers",
+      btnRetryExam: "New Random Attempt",
       btnBack: "✕ Back to Exams",
       scoreText: (ok, total) => `Score: ${ok} out of ${total}`,
       correctPrefix: "✓ Correct! ",
-      wrongMarked: (v) => `✗ You selected "${v}". `,
+      wrongMarked: (v) => `✗ Selected "${v}". `,
       unanswered: "✗ Unanswered. ",
       answerLabel: "Correct answer: ",
       yourErrors: "Questions to review",
@@ -52,38 +56,44 @@ const I18N = {
       scoreMsgs: [
         "Flawless! You completely mastered this exam.",
         "Great job! Review just the few questions you missed.",
-        "Passed! Review the explanations below and try another test.",
+        "Passed! Review the explanations below and try another random attempt.",
         "Keep practicing! Revisit the theory section and retry the exam."
       ],
       cardBeg1Title: "Beginner 1",
-      cardBeg1Desc: "15 fundamental exercises covering At, On, In, Before, and After.",
+      cardBeg1Desc: "15 randomized exercises covering To, At, On, In, Before, and After.",
       cardBeg2Title: "Beginner 2",
-      cardBeg2Desc: "15 exercises focusing on For, During, While, Since, and Until.",
+      cardBeg2Desc: "15 randomized exercises focusing on For, During, While, Since, and Until.",
       cardInt1Title: "Intermediate 1",
-      cardInt1Desc: "15 challenging questions mixing time, place, and during vs. for traps.",
+      cardInt1Desc: "15 randomized questions mixing destination (To), time, place, and During vs. For.",
       cardInt2Title: "Intermediate 2",
-      cardInt2Desc: "15 real-world sentences with until vs. by, while + -ing, and mixed clauses.",
+      cardInt2Desc: "15 randomized real-world sentences with Until vs. By, While + -ing, and mixed clauses.",
       btnStart: "Start Exam ➔"
     },
     traps: [
       {
-        title: "1. AT vs. ON vs. IN (Time Pyramid)",
+        title: "1. TO vs. AT vs. IN (Movement vs. Static Position)",
+        body: "<b>TO</b> implies <i>movement / destination</i>: I drive <b>to</b> work, go <b>to</b> bed, walk <b>to</b> the store.<br><b>AT</b> & <b>IN</b> are <i>static locations</i>: I am <b>at</b> work, I am <b>in</b> the classroom. (Note: with 'home', English omits 'to': <i>I go home</i>)."
+      },
+      {
+        title: "2. AT vs. ON vs. IN (Time Pyramid)",
         body: "<b>AT</b> = Precise time (at 3:00, at midnight, at night).<br><b>ON</b> = Days and dates (on Monday, on October 21st, on my birthday).<br><b>IN</b> = Months, years, seasons & periods of day (in July, in 2026, in the morning)."
       },
       {
-        title: "2. During vs. For («How long?» vs «When?»)",
+        title: "3. During vs. For («How long?» vs «When?»)",
         body: "<b>During</b> answers <i>when?</i> (named event: during the movie). <b>For</b> answers <i>how long?</i> (quantities/numbers: for 8 hours).<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
       },
       {
-        title: "3. Until vs. By (Continuous vs. Deadline)",
+        title: "4. Until vs. By (Continuous vs. Deadline)",
         body: "<b>Until</b> marks an action that continues without stopping up to that moment. <b>By</b> marks a deadline (finished at or before that hour).<br>✔️ <i>Wait <b>until</b> 5 pm.</i> (stay continuous).<br>✔️ <i>Finish <b>by</b> 5 pm.</i> (latest deadline)."
-      },
-      {
-        title: "4. While + Verb-ing (Reduced Clauses)",
-        body: "When both actions are done by the same subject, you can drop 'subject + be' and attach -ing directly:<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
       }
     ],
     lessons: [
+      {
+        w: "to", meaning: "destination / movement toward", tl: ["Origin", "to", "Destination"],
+        rule: "Used to indicate movement, direction, or a destination toward a person, place, or goal.",
+        ex: [["I walk to school every morning.", "Destination."], ["She moved to Canada last year.", "Country destination."], ["Talk to me after the meeting.", "Direction of communication."]],
+        tip: "Exception: Do not use 'to' with 'home': say 'go home', not 'go to home'."
+      },
       {
         w: "at", meaning: "specific clock time / exact spot", tl: ["Exact Point", "at"],
         rule: "Used for precise clock hours, meal times, and specific locations.",
@@ -153,19 +163,20 @@ const I18N = {
       modalTitle: "English Prepositions: Review & Training",
       modalSub: "Elige tu idioma para ver explicaciones y correcciones:",
       title: "Repaso y Entrenamiento de Preposiciones",
-      intro: "Guía diseñada especialmente para estudiantes de inglés. Repasa las bases indispensables (at, on, in, for), domina las estructuras de tiempo (before, after, during, while, since, until) y ponte a prueba con 4 exámenes divididos por nivel.",
-      nav: ["Teoría", "Trampas Clave", "Resumen Rápido", "Calentamiento", "Exámenes"],
+      intro: "Guía diseñada especialmente para estudiantes de inglés. Repasa las bases (to, at, on, in, for), domina las estructuras de tiempo (before, after, during, while, since, until) y ponte a prueba con 4 exámenes de preguntas aleatorias.",
+      nav: ["Teoría", "Trampas Clave", "Resumen Rápido", "Práctica", "Exámenes"],
       sec1Title: "1. Teoría y Reglas Fundamentales",
-      sec1Lead: "El secreto para dominar las preposiciones es fijarte si lo que viene después es una hora exacta, un día de calendario, un periodo general, un sustantivo o una frase completa.",
+      sec1Lead: "El secreto para dominar las preposiciones es fijarte si indican movimiento o destino, horas exactas, días, periodos, sustantivos o frases completas.",
       secTrapsTitle: "⚠️ Las 4 Trampas más Frecuentes",
       secTrapsLead: "Los errores que confunden a la mayoría de los estudiantes y cómo evitarlos:",
       sec2Title: "2. Resumen Rápido",
-      sec3Title: "3. Ejercicios de Calentamiento",
-      sec3Lead: "Elige la preposición correcta en cada frase y pulsa «Comprobar». Practica hasta dominar la regla.",
-      sec4Title: "4. Exámenes Finales por Nivel (60 Preguntas)",
-      sec4Lead: "Elige un nivel a continuación. Cada examen tiene 15 preguntas independientes con 4 opciones enfocadas, calificación automática y explicación de cada error.",
+      sec3Title: "3. Ejercicios de Práctica (Corrección Inmediata)",
+      sec3Lead: "Elige la preposición en cada frase: se marcará en VERDE si es correcta y en NARANJO si no lo es. ¡Practica hasta dominarla!",
+      sec4Title: "4. Exámenes Finales por Nivel (Preguntas Aleatorias)",
+      sec4Lead: "Elige un examen. Cada intento selecciona 15 preguntas aleatorias del banco. En el examen las opciones elegidas NO cambian de color hasta que entregues para ver tu nota final.",
       tableHeaders: ["Preposición", "Uso Principal", "Estructura que sigue", "Ejemplo"],
       tableRows: [
+        ["to", "Destino, movimiento y dirección", "Lugar, persona o meta", "go to school / walk to the park / talk to me"],
         ["at", "Horas exactas y lugares específicos", "Hora precisa / punto exacto", "at 5:00 PM / at the bus stop / at night"],
         ["on", "Días, fechas y superficies", "Día de la semana / fecha exacta", "on Monday / on October 21st / on the desk"],
         ["in", "Meses, años, estaciones y lugares cerrados", "Periodos amplios / espacios", "in July / in 2026 / in Canada / in the room"],
@@ -177,12 +188,11 @@ const I18N = {
         ["since", "Desde (punto de inicio pasado)", "momento inicial en el pasado", "since 2020 / since Monday / since I moved"],
         ["until", "Hasta (acción continua)", "momento final o frase", "until 6:00 PM / until you come back"]
       ],
-      quickTip: "<b>Pirámide de At, On, In:</b> <b>IN</b> es lo más amplio (año, mes, país). <b>ON</b> es intermedio (días, fechas, calles). <b>AT</b> es lo más preciso (horas de reloj, direcciones exactas).",
+      quickTip: "<b>Destino vs. Ubicación:</b> Usa <b>TO</b> para movimiento hacia un lugar (<i>I go to school</i>). Usa <b>AT</b> para estar en un punto puntual (<i>I am at school</i>) e <b>IN</b> para estar dentro de una ciudad o país (<i>I am in Canada</i>).",
       tipLabel: "Consejo:",
-      btnCheck: "Comprobar",
-      btnReset: "Reiniciar",
+      btnResetPractice: "Reiniciar práctica",
       btnSubmitExam: "Entregar examen y ver mi nota",
-      btnRetryExam: "Reiniciar respuestas",
+      btnRetryExam: "Nuevo intento aleatorio",
       btnBack: "✕ Volver a los exámenes",
       scoreText: (ok, total) => `Aciertos: ${ok} de ${total}`,
       correctPrefix: "✓ ¡Correcto! ",
@@ -194,38 +204,44 @@ const I18N = {
       scoreMsgs: [
         "¡Perfecto! Dominas totalmente este nivel.",
         "¡Muy bien! Revisa solo los pocos fallos que tuviste.",
-        "Aprobado. Lee las explicaciones abajo y prueba otro examen.",
+        "Aprobado. Lee las explicaciones abajo y prueba otro examen aleatorio.",
         "Aún necesitas practicar. Repasa la teoría y vuelve a intentarlo."
       ],
       cardBeg1Title: "Beginner 1",
-      cardBeg1Desc: "15 ejercicios fundamentales con At, On, In, Before y After.",
+      cardBeg1Desc: "15 ejercicios aleatorios con To, At, On, In, Before y After.",
       cardBeg2Title: "Beginner 2",
-      cardBeg2Desc: "15 ejercicios enfocados en For, During, While, Since y Until.",
+      cardBeg2Desc: "15 ejercicios aleatorios con For, During, While, Since y Until.",
       cardInt1Title: "Intermedio 1",
-      cardInt1Desc: "15 preguntas que combinan tiempo, lugar y la trampa During vs. For.",
+      cardInt1Desc: "15 preguntas aleatorias mezclando destino (To), tiempo, lugar y During vs. For.",
       cardInt2Title: "Intermedio 2",
       cardInt2Desc: "15 frases reales con Until vs. By, While + -ing y oraciones compuestas.",
       btnStart: "Comenzar Examen ➔"
     },
     traps: [
       {
-        title: "1. AT vs. ON vs. IN (La Pirámide)",
+        title: "1. TO vs. AT vs. IN (Movimiento vs. Posición Estática)",
+        body: "<b>TO</b> implica <i>movimiento o desplazamiento hacia un destino</i>: go <b>to</b> school, drive <b>to</b> work, walk <b>to</b> the park.<br><b>AT</b> e <b>IN</b> son <i>ubicaciones estáticas</i>: I am <b>at</b> work, I am <b>in</b> the classroom. (Ojo: con 'home' no se usa 'to': se dice <i>I go home</i>)."
+      },
+      {
+        title: "2. AT vs. ON vs. IN (La Pirámide del Tiempo)",
         body: "<b>AT</b> = Horas precisas (at 3:00, at midnight, at night).<br><b>ON</b> = Días y fechas (on Monday, on October 21st, on my birthday).<br><b>IN</b> = Meses, años, estaciones y partes del día (in July, in 2026, in the morning)."
       },
       {
-        title: "2. During vs. For («¿Cuándo?» vs «¿Cuánto tiempo?»)",
-        body: "<b>During</b> responde a <i>¿cuándo?</i> (un evento con nombre: during the movie). <b>For</b> responde a <i>¿cuánto tiempo?</i> (números: for 8 hours).<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+        title: "3. During vs. For («¿Cuándo?» vs «¿Cuánto tiempo?»)",
+        body: "<b>During</b> responde a <i>¿cuándo?</i> (un evento con nombre: during the movie). <b>For</b> responde a <i>¿cuánto tiempo?</i> (números/duración: for 8 hours).<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
       },
       {
-        title: "3. Until vs. By (Acción continua vs. Fecha límite)",
+        title: "4. Until vs. By (Acción continua vs. Fecha límite)",
         body: "<b>Until</b> indica que una acción continúa sin parar hasta esa hora. <b>By</b> es una fecha límite (terminar a más tardar a esa hora).<br>✔️ <i>Wait <b>until</b> 5 pm.</i> (espera de corrido).<br>✔️ <i>Finish <b>by</b> 5 pm.</i> (plazo máximo)."
-      },
-      {
-        title: "4. While + Verbo en -ing (Sujeto omitido)",
-        body: "Cuando la misma persona hace las dos cosas, se puede omitir el sujeto y conectar directo con -ing:<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
       }
     ],
     lessons: [
+      {
+        w: "to", meaning: "a / hacia (destino o movimiento)", tl: ["Origen", "to", "Destino"],
+        rule: "Indica movimiento, dirección o desplazamiento hacia un lugar, persona u objetivo.",
+        ex: [["I walk to school every morning.", "Destino físico."], ["She moved to Canada last year.", "Hacia un país."], ["Talk to me after the meeting.", "Dirección hacia una persona."]],
+        tip: "Excepción importante: con 'home' nunca uses 'to'. Di 'go home', jamás 'go to home'."
+      },
       {
         w: "at", meaning: "a las (hora) / en (lugar específico)", tl: ["Punto Exacto", "at"],
         rule: "Se usa para horas de reloj exactas, comidas del día y puntos de ubicación precisos.",
@@ -292,6 +308,7 @@ const I18N = {
 
 let CURRENT_LANG = "en";
 let ACTIVE_EXAM_KEY = null;
+let ACTIVE_EXAM_QUESTIONS = [];
 
 function setLanguage(lang) {
   if (!I18N[lang]) lang = "en";
@@ -306,20 +323,17 @@ function renderUI() {
   const data = I18N[CURRENT_LANG] || I18N["en"];
   const ui = data.ui;
 
-  // Modal & Titles
   document.getElementById("modalMainTitle").textContent = ui.modalTitle;
   document.getElementById("modalSub").textContent = ui.modalSub;
   document.getElementById("ui-title").textContent = ui.title;
   document.getElementById("ui-intro").textContent = ui.intro;
 
-  // Nav
   document.getElementById("nav-teoria").textContent = ui.nav[0];
   document.getElementById("nav-trampas").textContent = ui.nav[1];
   document.getElementById("nav-resumen").textContent = ui.nav[2];
   document.getElementById("nav-ejercicios").textContent = ui.nav[3];
   document.getElementById("nav-examen").textContent = ui.nav[4];
 
-  // Headings
   document.getElementById("ui-sec1-title").textContent = ui.sec1Title;
   document.getElementById("ui-sec1-lead").textContent = ui.sec1Lead;
   document.getElementById("ui-sec-traps-title").textContent = ui.secTrapsTitle;
@@ -330,15 +344,12 @@ function renderUI() {
   document.getElementById("ui-sec4-title").textContent = ui.sec4Title;
   document.getElementById("ui-sec4-lead").textContent = ui.sec4Lead;
 
-  // Buttons
-  document.getElementById("exBtn").textContent = ui.btnCheck;
-  document.getElementById("exReset").textContent = ui.btnReset;
+  document.getElementById("exReset").textContent = ui.btnResetPractice;
   document.getElementById("qzSubmitBtn").textContent = ui.btnSubmitExam;
   document.getElementById("qzRetryBtn").textContent = ui.btnRetryExam;
   document.getElementById("btnBackExams").textContent = ui.btnBack;
   document.getElementById("ui-tip-box").innerHTML = ui.quickTip;
 
-  // Exam Cards
   document.getElementById("lbl-b1").textContent = ui.cardBeg1Title;
   document.getElementById("desc-b1").textContent = ui.cardBeg1Desc;
   document.getElementById("btn-start-b1").textContent = ui.btnStart;
@@ -355,7 +366,6 @@ function renderUI() {
   document.getElementById("desc-i2").textContent = ui.cardInt2Desc;
   document.getElementById("btn-start-i2").textContent = ui.btnStart;
 
-  // Traps
   document.getElementById("trapsContainer").innerHTML = data.traps.map(t => `
     <div class="trap-card">
       <h3>${t.title}</h3>
@@ -363,116 +373,137 @@ function renderUI() {
     </div>
   `).join("");
 
-  // Summary Table
   document.getElementById("tableHeader").innerHTML = ui.tableHeaders.map(h => `<th>${h}</th>`).join("");
   document.getElementById("tableBody").innerHTML = ui.tableRows.map(r => `
     <tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>
   `).join("");
 
-  // Lessons
   document.getElementById("lessons").innerHTML = data.lessons.map(l => `
     <article class="lesson" id="l-${l.w}">
       <h3>${l.w} <small>= ${l.meaning}</small></h3>
       <p class="rule">${l.rule}</p>
-      <div class="tl"><b>${l.tl[0]}</b><i></i><em>${l.w}</em>${l.tl[1]?`<i></i><b>${l.tl[1]}</b>`:""}</div>
+      <div class="tl"><b>${l.tl[0]}</b><i></i><em>${l.tl[1]}</em>${l.tl[2]?`<i></i><b>${l.tl[2]}</b>`:""}</div>
       <ul>${l.ex.map(e => `<li>${e[0]} <span>— ${e[1]}</span></li>`).join("")}</ul>
       <div class="tip"><b>${ui.tipLabel}</b> ${l.tip}</div>
     </article>
   `).join("");
 
-  // Warm-up list
-  buildExerciseList("ex", WARMUP_DATA, data.meta.chooseOpt);
-  document.getElementById("exScore").textContent = "";
+  // Build Practice with instant color feedback
+  buildPracticeList();
 
-  if (ACTIVE_EXAM_KEY) {
-    loadExam(ACTIVE_EXAM_KEY, false);
+  if (ACTIVE_EXAM_KEY && ACTIVE_EXAM_QUESTIONS.length > 0) {
+    renderActiveExamQuestions();
   }
 }
 
 /**
- * Builds list where EACH QUESTION has only its 4 specific options (item.opts)
+ * Builds Practice List:
+ * - Each item triggers onchange:
+ *   - Green if correct
+ *   - Orange if wrong
+ *   - Updates live practice counter
  */
-function buildExerciseList(containerId, items, chooseText) {
-  document.getElementById(containerId).innerHTML = items.map((item, i) => {
+function buildPracticeList() {
+  const data = I18N[CURRENT_LANG] || I18N["en"];
+  const chooseText = data.meta.chooseOpt;
+  const container = document.getElementById("ex");
+
+  container.innerHTML = WARMUP_DATA.map((item, i) => {
     const parts = item.s.split("___");
     const optionsHtml = item.opts.map(opt => `<option value="${opt}">${opt}</option>`).join("");
-    return `<li>
-      <span>${parts[0]}<select aria-label="Question ${i+1}"><option value="">${chooseText}</option>${optionsHtml}</select>${parts[1]}</span>
-      <span class="fb"></span>
+    return `<li id="p-item-${i}">
+      <div class="q-row">
+        <span class="q-num">${i+1}.</span>
+        <span class="q-text">${parts[0]}</span>
+        <select onchange="checkPracticeItem(${i}, this.value)" aria-label="Question ${i+1}">
+          <option value="">${chooseText}</option>
+          ${optionsHtml}
+        </select>
+        <span class="q-text">${parts[1]}</span>
+      </div>
+      <span class="fb" id="p-fb-${i}"></span>
     </li>`;
   }).join("");
+
+  updatePracticeScore();
 }
 
-function gradeList(containerId, items, showFeedback) {
+function checkPracticeItem(index, selectedVal) {
   const data = I18N[CURRENT_LANG] || I18N["en"];
   const ui = data.ui;
-  const listElements = [...document.querySelectorAll("#" + containerId + " li")];
-  let ok = 0;
-  const errs = [];
+  const item = WARMUP_DATA[index];
+  const li = document.getElementById(`p-item-${index}`);
+  const fb = document.getElementById(`p-fb-${index}`);
 
-  listElements.forEach((li, i) => {
-    const sel = li.querySelector("select");
-    const val = sel.value;
-    const isCorrect = val === items[i].a;
-    const exp = items[i].exp;
-
-    if (isCorrect) {
-      ok++;
-    } else {
-      errs.push({
-        num: i + 1,
-        sentence: items[i].s.replace("___", "<b>" + items[i].a + "</b>"),
-        val: val,
-        why: exp
-      });
-    }
-
-    if (showFeedback) {
-      li.className = isCorrect ? "ok" : "bad";
-      const fb = li.querySelector(".fb");
-      if (isCorrect) {
-        fb.innerHTML = ui.correctPrefix + exp;
-      } else {
-        const markedPart = val ? ui.wrongMarked(val) : ui.unanswered;
-        fb.innerHTML = markedPart + ui.answerLabel + "<b>" + items[i].a + "</b>. " + exp;
-      }
-    }
-  });
-
-  return { ok, total: items.length, errs };
-}
-
-function resetList(containerId) {
-  document.querySelectorAll("#" + containerId + " li").forEach(li => {
+  if (!selectedVal) {
     li.className = "";
-    li.querySelector("select").value = "";
-    li.querySelector(".fb").textContent = "";
-  });
+    fb.textContent = "";
+    updatePracticeScore();
+    return;
+  }
+
+  if (selectedVal === item.a) {
+    li.className = "practice-ok"; // GREEN
+    fb.innerHTML = ui.correctPrefix + item.exp;
+  } else {
+    li.className = "practice-wrong"; // ORANGE
+    fb.innerHTML = ui.wrongMarked(selectedVal) + ui.answerLabel + `<b>${item.a}</b>. ` + item.exp;
+  }
+
+  updatePracticeScore();
 }
 
-// Warm-up buttons
-document.getElementById("exBtn").onclick = () => {
+function updatePracticeScore() {
   const data = I18N[CURRENT_LANG] || I18N["en"];
-  const r = gradeList("ex", WARMUP_DATA, true);
-  document.getElementById("exScore").textContent = data.ui.scoreText(r.ok, r.total);
-};
+  const correctCount = document.querySelectorAll("#ex li.practice-ok").length;
+  document.getElementById("exScore").textContent = data.ui.scoreText(correctCount, WARMUP_DATA.length);
+}
+
 document.getElementById("exReset").onclick = () => {
-  resetList("ex");
-  document.getElementById("exScore").textContent = "";
+  document.querySelectorAll("#ex li").forEach(li => {
+    li.className = "";
+    const sel = li.querySelector("select");
+    if (sel) sel.value = "";
+    const fb = li.querySelector(".fb");
+    if (fb) fb.textContent = "";
+  });
+  updatePracticeScore();
 };
 
-/* Exam Loading and Submission */
+/**
+ * EXAM CONTROLLER:
+ * - Selects 15 random questions from the level pool on every load
+ * - Selects are neutral (NO color marking until submitted)
+ */
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 function loadExam(examKey, scrollToView = true) {
   ACTIVE_EXAM_KEY = examKey;
-  const exam = EXAMS[examKey];
-  const data = I18N[CURRENT_LANG] || I18N["en"];
+  const pool = EXAMS_POOL[examKey] || [];
+  // Sample 15 distinct random questions
+  ACTIVE_EXAM_QUESTIONS = shuffleArray(pool).slice(0, 15);
 
   document.getElementById("examMenu").style.display = "none";
   const box = document.getElementById("activeExamBox");
   box.style.display = "block";
 
-  document.getElementById("activeExamTitle").textContent = exam.title;
-  buildExerciseList("activeQzList", exam.questions, data.meta.chooseOpt);
+  const langData = I18N[CURRENT_LANG] || I18N["en"];
+  const titleMap = {
+    beg1: langData.ui.cardBeg1Title,
+    beg2: langData.ui.cardBeg2Title,
+    int1: langData.ui.cardInt1Title,
+    int2: langData.ui.cardInt2Title
+  };
+  document.getElementById("activeExamTitle").textContent = titleMap[examKey] || "Exam";
+
+  renderActiveExamQuestions();
   document.getElementById("result").style.display = "none";
 
   if (scrollToView) {
@@ -480,35 +511,79 @@ function loadExam(examKey, scrollToView = true) {
   }
 }
 
+function renderActiveExamQuestions() {
+  const data = I18N[CURRENT_LANG] || I18N["en"];
+  const chooseText = data.meta.chooseOpt;
+  const container = document.getElementById("activeQzList");
+
+  container.innerHTML = ACTIVE_EXAM_QUESTIONS.map((item, i) => {
+    const parts = item.s.split("___");
+    const optionsHtml = item.opts.map(opt => `<option value="${opt}">${opt}</option>`).join("");
+    return `<li>
+      <div class="q-row">
+        <span class="q-num">${i+1}.</span>
+        <span class="q-text">${parts[0]}</span>
+        <select aria-label="Exam Question ${i+1}">
+          <option value="">${chooseText}</option>
+          ${optionsHtml}
+        </select>
+        <span class="q-text">${parts[1]}</span>
+      </div>
+      <span class="fb"></span>
+    </li>`;
+  }).join("");
+}
+
 function closeExam() {
   ACTIVE_EXAM_KEY = null;
+  ACTIVE_EXAM_QUESTIONS = [];
   document.getElementById("activeExamBox").style.display = "none";
   document.getElementById("examMenu").style.display = "grid";
   document.getElementById("result").style.display = "none";
 }
 
 document.getElementById("qzSubmitBtn").onclick = () => {
-  if (!ACTIVE_EXAM_KEY) return;
-  const exam = EXAMS[ACTIVE_EXAM_KEY];
+  if (!ACTIVE_EXAM_KEY || ACTIVE_EXAM_QUESTIONS.length === 0) return;
   const data = I18N[CURRENT_LANG] || I18N["en"];
   const ui = data.ui;
-  const r = gradeList("activeQzList", exam.questions, false);
-  const total = r.total;
-  const score = r.ok;
-  const pct = Math.round((score / total) * 100);
+  const listItems = [...document.querySelectorAll("#activeQzList li")];
+
+  let ok = 0;
+  const errs = [];
+
+  listItems.forEach((li, i) => {
+    const sel = li.querySelector("select");
+    const val = sel.value;
+    const item = ACTIVE_EXAM_QUESTIONS[i];
+    const isCorrect = val === item.a;
+
+    if (isCorrect) {
+      ok++;
+    } else {
+      errs.push({
+        num: i + 1,
+        sentence: item.s.replace("___", `<b>${item.a}</b>`),
+        val: val,
+        why: item.exp
+      });
+    }
+  });
+
+  const total = ACTIVE_EXAM_QUESTIONS.length;
+  const pct = Math.round((ok / total) * 100);
 
   let msg = ui.scoreMsgs[3];
-  if (score === total) msg = ui.scoreMsgs[0];
-  else if (score >= 12) msg = ui.scoreMsgs[1];
-  else if (score >= 9) msg = ui.scoreMsgs[2];
+  if (ok === total) msg = ui.scoreMsgs[0];
+  else if (ok >= 12) msg = ui.scoreMsgs[1];
+  else if (ok >= 9) msg = ui.scoreMsgs[2];
 
   const resBox = document.getElementById("result");
   resBox.style.display = "block";
   resBox.innerHTML = `
-    <div class="big">${score}/${total}</div>
+    <div class="big">${ok}/${total}</div>
     <p><b>${msg}</b> (${pct}%)</p>
-    ${r.errs.length 
-      ? `<h3>${ui.yourErrors}</h3>` + r.errs.map(e => `
+    ${errs.length 
+      ? `<h3>${ui.yourErrors}</h3>` + errs.map(e => `
           <div class="err">
             <b>Q${e.num}:</b> ${e.sentence}<br>
             ${e.val ? ui.wrongMarked(e.val) : ui.unanswered} ${e.why}
@@ -521,8 +596,9 @@ document.getElementById("qzSubmitBtn").onclick = () => {
 };
 
 document.getElementById("qzRetryBtn").onclick = () => {
-  resetList("activeQzList");
-  document.getElementById("result").style.display = "none";
+  if (ACTIVE_EXAM_KEY) {
+    loadExam(ACTIVE_EXAM_KEY, false);
+  }
 };
 
 window.addEventListener("DOMContentLoaded", () => {

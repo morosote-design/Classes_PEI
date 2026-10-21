@@ -66,6 +66,7 @@
   <h1 class="main-title" id="ui-title">Prepositions Review & Training</h1>
   <p class="lead-intro" id="ui-intro"></p>
   <div class="words">
+    <a href="#l-to">to</a>
     <a href="#l-at">at</a>
     <a href="#l-on">on</a>
     <a href="#l-in">in</a>
@@ -84,7 +85,7 @@
     <a href="#teoria" id="nav-teoria">Theory</a>
     <a href="#trampas" id="nav-trampas">Common Traps</a>
     <a href="#resumen" id="nav-resumen">Quick Summary</a>
-    <a href="#ejercicios" id="nav-ejercicios">Warm-up Exercises</a>
+    <a href="#ejercicios" id="nav-ejercicios">Practice Exercises</a>
     <a href="#examen" id="nav-examen">Final Exams (4 Levels)</a>
   </div>
 </nav>
@@ -116,11 +117,10 @@
 </section>
 
 <section id="ejercicios">
-  <h2 class="sec-heading" id="ui-sec3-title">3. Warm-up Exercises</h2>
+  <h2 class="sec-heading" id="ui-sec3-title">3. Practice Exercises (Instant Feedback)</h2>
   <p class="lead" id="ui-sec3-lead"></p>
   <ol class="q" id="ex"></ol>
-  <button id="exBtn">Check Answers</button>
-  <button class="alt" id="exReset">Reset</button>
+  <button class="alt" id="exReset">Reset Practice</button>
   <span class="score" id="exScore"></span>
 </section>
 
@@ -134,7 +134,7 @@
       <div>
         <span class="level-tag level-beg">Beginner</span>
         <h3 id="lbl-b1">Beginner 1</h3>
-        <p id="desc-b1">15 fundamental exercises covering At, On, In, Before, and After.</p>
+        <p id="desc-b1">15 randomized exercises covering To, At, On, In, Before, and After.</p>
       </div>
       <div class="start-btn" id="btn-start-b1">Start Exam ➔</div>
     </div>
@@ -143,7 +143,7 @@
       <div>
         <span class="level-tag level-beg">Beginner</span>
         <h3 id="lbl-b2">Beginner 2</h3>
-        <p id="desc-b2">15 exercises focusing on For, During, While, Since, and Until.</p>
+        <p id="desc-b2">15 randomized exercises focusing on For, During, While, Since, and Until.</p>
       </div>
       <div class="start-btn" id="btn-start-b2">Start Exam ➔</div>
     </div>
@@ -152,7 +152,7 @@
       <div>
         <span class="level-tag level-int">Intermediate</span>
         <h3 id="lbl-i1">Intermediate 1</h3>
-        <p id="desc-i1">15 challenging questions mixing time, place, and during vs. for traps.</p>
+        <p id="desc-i1">15 randomized questions mixing destination (To), time, place, and During vs. For.</p>
       </div>
       <div class="start-btn" id="btn-start-i1">Start Exam ➔</div>
     </div>
@@ -161,7 +161,7 @@
       <div>
         <span class="level-tag level-int">Intermediate</span>
         <h3 id="lbl-i2">Intermediate 2</h3>
-        <p id="desc-i2">15 real-world sentences with until vs. by, while + -ing, and mixed clauses.</p>
+        <p id="desc-i2">15 randomized real-world sentences with Until vs. By, While + -ing, and mixed clauses.</p>
       </div>
       <div class="start-btn" id="btn-start-i2">Start Exam ➔</div>
     </div>
@@ -173,9 +173,9 @@
       <h3 id="activeExamTitle">Exam</h3>
       <button class="alt" onclick="closeExam()" id="btnBackExams" style="margin:0;padding:6px 14px;font-size:.88rem">✕ Back to Exams</button>
     </div>
-    <ol class="q" id="activeQzList"></ol>
+    <ol class="q exam-q" id="activeQzList"></ol>
     <button id="qzSubmitBtn">Submit Exam & See Score</button>
-    <button class="alt" id="qzRetryBtn">Reset Answers</button>
+    <button class="alt" id="qzRetryBtn">New Random Attempt</button>
     <div id="result" role="status" aria-live="polite"></div>
   </div>
 </section>

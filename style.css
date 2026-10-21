@@ -1,14 +1,14 @@
 /* style.css */
 :root{
   --bg:#f4f7f9;--card:#ffffff;--ink:#152839;--mut:#506477;--line:#d2dee6;
-  --teal:#0e7c86;--teal-dark:#08545b;--amber:#f0a22e;--ok:#16803d;--bad:#c0392b;
-  --okbg:#e3f5ea;--badbg:#fce9e6;--accent-bg:#e8f4f6;--note-bg:#fff9e6;--note-line:#e5be67;
+  --teal:#0e7c86;--teal-dark:#08545b;--amber:#ea8c12;--ok:#16803d;--bad:#c0392b;
+  --okbg:#e4f6eb;--warnbg:#fef4e8;--warnline:#f3a847;--accent-bg:#e8f4f6;--note-bg:#fff9e6;--note-line:#e5be67;
 }
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#0e1b26;--card:#162837;--ink:#e7eff5;--mut:#9cb1c2;--line:#293f52;
-    --teal:#4cc3cd;--teal-dark:#117983;--amber:#f5b94f;--ok:#5fd68b;--bad:#ff8a7a;
-    --okbg:#133829;--badbg:#43201c;--accent-bg:#153344;--note-bg:#2a2514;--note-line:#997a29;
+    --teal:#4cc3cd;--teal-dark:#117983;--amber:#f6a536;--ok:#5fd68b;--bad:#ff8a7a;
+    --okbg:#133829;--warnbg:#362612;--warnline:#d4841c;--accent-bg:#153344;--note-bg:#2a2514;--note-line:#997a29;
   }
 }
 *{box-sizing:border-box}
@@ -88,15 +88,36 @@ th,td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;vert
 th{background:var(--bg);font-weight:700}
 .wrap{overflow-x:auto}
 
+/* LIST OF QUESTIONS */
 ol.q{list-style:none;counter-reset:q;padding:0;margin:0}
-ol.q li{counter-increment:q;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0;transition:border-color .15s}
-ol.q li>span::before{content:counter(q) ". ";color:var(--mut);font-weight:700}
-select{font:inherit;font-weight:600;padding:5px 10px;border-radius:6px;border:2px solid var(--line);background:var(--bg);color:var(--ink);margin:0 4px;cursor:pointer}
+ol.q li{
+  counter-increment:q;background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 20px;margin:14px 0;transition:all .2s ease;
+}
+.q-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;font-size:1.05rem}
+.q-num{color:var(--mut);font-weight:700;margin-right:4px}
+.q-text{display:inline}
+
+select{
+  font:inherit;font-weight:600;padding:5px 10px;border-radius:8px;border:2px solid var(--line);
+  background:var(--bg);color:var(--ink);margin:0 4px;cursor:pointer;transition:border-color .15s;
+}
 select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
-li.ok{border-color:var(--ok);background:var(--okbg)}li.ok select{border-color:var(--ok)}
-li.bad{border-color:var(--bad);background:var(--badbg)}li.bad select{border-color:var(--bad)}
-.fb{display:block;margin-top:8px;font-size:.92rem;font-weight:500}
-li.ok .fb{color:var(--ok)}li.bad .fb{color:var(--bad)}
+
+/* PRACTICE INSTANT STYLING: GREEN (CORRECT) & ORANGE (WRONG) */
+li.practice-ok{border-color:var(--ok);background:var(--okbg)}
+li.practice-ok select{border-color:var(--ok)}
+li.practice-wrong{border-color:var(--warnline);background:var(--warnbg)}
+li.practice-wrong select{border-color:var(--warnline)}
+
+.fb{display:block;margin-top:8px;font-size:.92rem;font-weight:600}
+li.practice-ok .fb{color:var(--ok)}
+li.practice-wrong .fb{color:var(--amber)}
+
+/* EXAM NEUTRAL SELECTION (NO COLOR ON CHOSEN OPTION) */
+.exam-q li{border-color:var(--line);background:var(--card)}
+.exam-q select{border-color:var(--line)}
+.exam-q select:focus{border-color:var(--teal)}
 
 button{font:inherit;font-weight:700;background:var(--teal);color:#fff;border:0;border-radius:8px;padding:11px 22px;cursor:pointer;margin-top:10px;transition:all .15s ease}
 button:hover{opacity:.9;transform:translateY(-1px)}
@@ -106,8 +127,8 @@ button.alt{background:transparent;color:var(--teal);border:2px solid var(--teal)
 .score{font-weight:700;margin-left:14px;display:inline-block;margin-top:10px}
 #result{margin-top:24px;display:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
 #result .big{font-size:2.8rem;font-weight:800;line-height:1}
-#result .err{background:var(--badbg);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.95rem;border-left:4px solid var(--bad)}
-#result .err b{color:var(--bad)}
+#result .err{background:var(--warnbg);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.95rem;border-left:4px solid var(--warnline)}
+#result .err b{color:var(--amber)}
 .good{background:var(--okbg);border-radius:8px;padding:12px 16px;font-weight:600;color:var(--ok)}
 
 .trap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px}
