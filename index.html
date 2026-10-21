@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactive Grammar: before, after, during, while, since, until</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f7f8;--card:#fff;--ink:#16293a;--mut:#51657a;--line:#d3dee4;
+  --teal:#0e7c86;--teal-dark:#08545b;--amber:#f0a22e;--ok:#17803d;--bad:#c0392b;
+  --okbg:#e4f5ea;--badbg:#fbe9e6;--accent-bg:#e9f4f6;--note-bg:#fff9e6;--note-line:#e5be67;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1c27;--card:#172a38;--ink:#e8f0f4;--mut:#9fb3c3;--line:#2b4254;
+    --teal:#4cc3cd;--teal-dark:#117983;--amber:#f5b94f;--ok:#5fd68b;--bad:#ff8a7a;
+    --okbg:#14382a;--badbg:#44211d;--accent-bg:#163445;--note-bg:#2b2615;--note-line:#997a29;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.6 "Bricolage Grotesque","Noto Sans KR","Noto Sans SC","Noto Sans JP","Noto Sans Malayalam",system-ui,-apple-system,"Segoe UI",sans-serif;
+  transition:background-color .2s,color .2s;
+}
+
+#langModal{
+  position:fixed;inset:0;background:rgba(15,28,39,.75);backdrop-filter:blur(6px);
+  z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;
+}
+#langModal.hidden{display:none}
+.modal-card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;max-width:580px;width:100%;
+  padding:32px 28px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.25);
+}
+.modal-card h2{font-size:1.9rem;margin:0 0 8px;font-weight:800}
+.modal-card p{color:var(--mut);margin:0 0 24px;font-size:1rem}
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.lang-btn{
+  background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 10px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .18s ease;font-weight:700;color:var(--ink);
+}
+.lang-btn:hover{border-color:var(--teal);transform:translateY(-2px);background:var(--accent-bg)}
+.lang-btn span.flag{font-size:1.8rem;line-height:1}
+.lang-btn span.sub{font-size:.78rem;font-weight:400;color:var(--mut)}
+
+.top-bar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 20px;font-size:.9rem}
+.top-bar-inner{max-width:860px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lang-selector-group{display:flex;align-items:center;gap:8px}
+.lang-selector-group select{
+  font:inherit;font-weight:600;padding:5px 10px;border-radius:8px;border:1.5px solid var(--line);
+  background:var(--bg);color:var(--ink);cursor:pointer;
+}
+
+header{padding:48px 20px 32px;max-width:860px;margin:0 auto}
+h1{font-size:clamp(1.9rem,5.5vw,3.2rem);line-height:1.15;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+header p.lead-intro{color:var(--mut);max-width:68ch;margin:0;font-size:1.05rem}
+.words{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.words a{padding:6px 15px;border-radius:99px;background:var(--teal);color:#fff;text-decoration:none;font-weight:700;font-size:.95rem}
+@media(prefers-color-scheme:dark){.words a{color:#06242a}}
+
+nav{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav div{max-width:860px;margin:auto;padding:12px 20px;display:flex;gap:20px;overflow-x:auto;white-space:nowrap}
+nav a{color:var(--mut);text-decoration:none;font-weight:700}
+nav a:hover,nav a:focus-visible{color:var(--teal)}
+
+main{max-width:860px;margin:auto;padding:0 20px 90px}
+section{margin-top:46px}
+h2{font-size:1.8rem;margin:0 0 8px;letter-spacing:-.01em}
+.lead{color:var(--mut);margin:0 0 20px}
+
+.lesson{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--teal);border-radius:12px;padding:22px 24px;margin:20px 0}
+.lesson h3{margin:0;font-size:1.55rem;display:flex;align-items:baseline;flex-wrap:wrap;gap:8px}
+.lesson h3 small{font-weight:400;color:var(--mut);font-size:1.05rem}
+.rule{margin:10px 0 14px;font-size:1.02rem}
+.tl{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:.95rem;flex-wrap:wrap}
+.tl b{background:var(--bg);border:1px solid var(--line);padding:4px 12px;border-radius:6px;font-weight:700}
+.tl i{flex:1;min-width:40px;height:3px;background:var(--amber);position:relative;border-radius:2px}
+.tl em{font-style:normal;color:var(--teal);font-weight:800}
+.lesson ul{padding-left:22px;margin:10px 0}
+.lesson li{margin:6px 0}
+.lesson li span{color:var(--mut)}
+
+.tip{background:var(--bg);border-radius:8px;padding:12px 16px;margin-top:14px;font-size:.95rem;border-left:3px solid var(--amber)}
+.pro-card{background:var(--note-bg);border:1px solid var(--note-line);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:.95rem}
+.pro-card b{color:var(--amber)}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);font-size:.95rem;border-radius:8px;overflow:hidden}
+th,td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--bg);font-weight:700}
+.wrap{overflow-x:auto}
+ol.q{list-style:none;counter-reset:q;padding:0;margin:0}
+ol.q li{counter-increment:q;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0;transition:border-color .15s}
+ol.q li>span::before{content:counter(q) ". ";color:var(--mut);font-weight:700}
+select{font:inherit;padding:4px 8px;border-radius:6px;border:2px solid var(--line);background:var(--bg);color:var(--ink);margin:0 4px}
+select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+li.ok{border-color:var(--ok);background:var(--okbg)}li.ok select{border-color:var(--ok)}
+li.bad{border-color:var(--bad);background:var(--badbg)}li.bad select{border-color:var(--bad)}
+.fb{display:block;margin-top:8px;font-size:.92rem;font-weight:500}
+li.ok .fb{color:var(--ok)}li.bad .fb{color:var(--bad)}
+button{font:inherit;font-weight:700;background:var(--teal);color:#fff;border:0;border-radius:8px;padding:11px 24px;cursor:pointer;margin-top:10px;transition:opacity .15s}
+button:hover{opacity:.9}
+@media(prefers-color-scheme:dark){button{color:#06242a}}
+button.alt{background:transparent;color:var(--teal);border:2px solid var(--teal);margin-left:8px}
+.score{font-weight:700;margin-left:14px;display:inline-block;margin-top:10px}
+#result{margin-top:24px;display:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
+#result .big{font-size:2.8rem;font-weight:800;line-height:1}
+#result .err{background:var(--badbg);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.95rem;border-left:4px solid var(--bad)}
+#result .err b{color:var(--bad)}
+.good{background:var(--okbg);border-radius:8px;padding:12px 16px;font-weight:600;color:var(--ok)}
+.trap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px}
+.trap-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
+.trap-card h3{margin:0 0 8px;font-size:1.15rem;color:var(--teal)}
+.trap-card p{margin:4px 0;font-size:.93rem}
+</style>
+</head>
+<body>
+
+<div id="langModal">
+  <div class="modal-card">
+    <h2 id="modalTitle">Choose your language / Elige tu idioma</h2>
+    <p id="modalSub">Select the language for the course explanations and interface:</p>
+    <div class="lang-grid">
+      <button class="lang-btn" onclick="setLanguage('en')">
+        <span class="flag">🇺🇸</span> English <span class="sub">English</span>
+      </button>
+      <button class="lang-btn" onclick="setLanguage('es')">
+        <span class="flag">🇪🇸</span> Español <span class="sub">Spanish</span>
+      </button>
+      <button class="lang-btn" onclick="setLanguage('pt-BR')">
+        <span class="flag">🇧🇷</span> Português <span class="sub">Brasil</span>
+      </button>
+      <button class="lang-btn" onclick="setLanguage('ko')">
+        <span class="flag">🇰🇷</span> 한국어 <span class="sub">Korean</span>
+      </button>
+      <button class="lang-btn" onclick="setLanguage('zh')">
+        <span class="flag">🇨🇳</span> 中文 <span class="sub">Mandarin</span>
+      </button>
+      <button class="lang-btn" onclick="setLanguage('ja')">
+        <span class="flag">🇯🇵</span> 日本語 <span class="sub">Japanese</span>
+      </button>
+      <button class="lang-btn" onclick="setLanguage('ml')">
+        <span class="flag">🇮🇳</span> മലയാളം <span class="sub">Malayalam</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span style="font-weight:700;color:var(--teal)">🌍 Interactive Multilingual Grammar</span>
+    <div class="lang-selector-group">
+      <label for="langSelect" id="langSelectLabel">🌐 Language:</label>
+      <select id="langSelect" onchange="setLanguage(this.value)">
+        <option value="en">English (US/UK)</option>
+        <option value="es">Español</option>
+        <option value="pt-BR">Português (Brasil)</option>
+        <option value="ko">한국어 (Korean)</option>
+        <option value="zh">中文 (Mandarin)</option>
+        <option value="ja">日本語 (Japanese)</option>
+        <option value="ml">മലയാളം (Malayalam)</option>
+      </select>
+      <button class="alt" style="padding:4px 10px;margin:0;font-size:.82rem" onclick="document.getElementById('langModal').classList.remove('hidden')">⇄ Switch</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <h1 id="ui-title">Before, after, during, while, since, until</h1>
+  <p class="lead-intro" id="ui-intro"></p>
+  <div class="words">
+    <a href="#l-before">before</a>
+    <a href="#l-after">after</a>
+    <a href="#l-during">during</a>
+    <a href="#l-while">while</a>
+    <a href="#l-since">since</a>
+    <a href="#l-until">until</a>
+  </div>
+</header>
+
+<nav>
+  <div>
+    <a href="#teoria" id="nav-teoria">Theory</a>
+    <a href="#trampas" id="nav-trampas">Common Traps</a>
+    <a href="#resumen" id="nav-resumen">Summary</a>
+    <a href="#ejercicios" id="nav-ejercicios">Exercises</a>
+    <a href="#examen" id="nav-examen">Quiz</a>
+  </div>
+</nav>
+
+<main>
+<section id="teoria">
+  <h2 id="ui-sec1-title">1. Theory & Deep Dive</h2>
+  <p class="lead" id="ui-sec1-lead"></p>
+  <div id="lessons"></div>
+</section>
+
+<section id="trampas">
+  <h2 id="ui-sec-traps-title">⚠️ Common Mistakes & Pitfalls</h2>
+  <p class="lead" id="ui-sec-traps-lead"></p>
+  <div class="trap-grid" id="trapsContainer"></div>
+</section>
+
+<section id="resumen">
+  <h2 id="ui-sec2-title">2. Quick Summary</h2>
+  <div class="wrap">
+    <table id="summaryTable">
+      <thead>
+        <tr id="tableHeader"></tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <p class="lead" style="margin-top:14px" id="ui-tip-box"></p>
+</section>
+
+<section id="ejercicios">
+  <h2 id="ui-sec3-title">3. Practice Exercises</h2>
+  <p class="lead" id="ui-sec3-lead"></p>
+  <ol class="q" id="ex"></ol>
+  <button id="exBtn">Check Answers</button>
+  <button class="alt" id="exReset">Reset</button>
+  <span class="score" id="exScore"></span>
+</section>
+
+<section id="examen">
+  <h2 id="ui-sec4-title">4. Quick Quiz (14 Questions)</h2>
+  <p class="lead" id="ui-sec4-lead"></p>
+  <ol class="q" id="qz"></ol>
+  <button id="qzBtn">Show My Score</button>
+  <button class="alt" id="qzReset">Start Over</button>
+  <div id="result" role="status" aria-live="polite"></div>
+</section>
+</main>
+
+<script>
+const W = ["before", "after", "during", "while", "since", "until"];
+
+const I18N = {
+  es: {
+    meta: { name: "Español", chooseOpt: "elige…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "Curso completo y práctico para dominar seis palabras de tiempo en inglés. Teoría detallada, trampas frecuentes, ejercicios interactivos con corrección y examen final con nota.",
+      nav: ["Teoría", "Trampas clave", "Resumen", "Ejercicios", "Examen"],
+      sec1Title: "1. Teoría y Detalles Clave",
+      sec1Lead: "Todas estas palabras hablan del tiempo. Lo importante es saber qué estructura viene después y cómo evitar las confusiones más comunes.",
+      secTrapsTitle: "⚠️ Las 4 Trampas más Frecuentes",
+      secTrapsLead: "Los errores típicos que confunden a casi todos los estudiantes y cómo evitarlos:",
+      sec2Title: "2. Resumen rápido",
+      sec3Title: "3. Ejercicios",
+      sec3Lead: "Elige la palabra correcta en cada frase y pulsa «Comprobar». Puedes repetir las veces que quieras.",
+      sec4Title: "4. Examen de Dominio (14 Preguntas)",
+      sec4Lead: "14 preguntas cuidadosamente seleccionadas. Al terminar pulsa «Ver mi nota» para conocer tu puntaje y revisar las explicaciones.",
+      tableHeaders: ["Palabra", "Significa", "Después va…", "Ejemplo"],
+      tableRows: [
+        ["before", "antes de", "sustantivo, verbo+ing o frase", "Before lunch / before eating / before I eat"],
+        ["after", "después de", "sustantivo, verbo+ing o frase", "After class / after leaving / after I leave"],
+        ["during", "durante (en un evento)", "solo sustantivo (evento/periodo)", "during the film / during winter"],
+        ["while", "mientras", "frase (sujeto + verbo) o verbo-ing", "while she was driving / while driving"],
+        ["since", "desde (punto de inicio)", "momento inicial (año, día, hecho)", "since 2020 / since I moved"],
+        ["until", "hasta (acción continua)", "momento final en el tiempo", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>Regla de oro:</b> si después hay un evento o periodo sin verbo, usa <b>during</b>. Si hay sujeto + verbo, usa <b>while</b>.",
+      tipLabel: "Ojo:",
+      btnCheck: "Comprobar",
+      btnReset: "Reiniciar",
+      btnGrade: "Ver mi nota",
+      btnRestart: "Empezar de nuevo",
+      scoreText: (ok, total) => `Aciertos: ${ok} de ${total}`,
+      correctPrefix: "✓ ¡Correcto! ",
+      wrongMarked: (v) => `✗ Marcaste «${v}». `,
+      unanswered: "✗ Sin responder. ",
+      answerLabel: "Respuesta: ",
+      yourErrors: "Tus errores a repasar",
+      noErrors: "¡Excelente trabajo! No tuviste ningún error.",
+      scoreMsgs: [
+        "¡Perfecto! Dominas totalmente estas palabras y sus trampas.",
+        "¡Muy bien! Repasa solo los pocos errores que tuviste.",
+        "Aprobado. Revisa las notas de los errores y vuelve a intentarlo.",
+        "Aún necesitas practicar. Repasa la teoría y vuelve a hacer los ejercicios."
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For («Durante»)",
+        body: "<b>During</b> responde a <i>¿cuándo?</i> (un evento: during the movie). <b>For</b> responde a <i>¿cuánto tiempo?</i> (cifras/duración: for 8 hours).<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By («Hasta»)",
+        body: "<b>Until</b> indica una acción <i>continua</i> hasta ese momento (Wait until 6 pm). <b>By</b> es una fecha límite / plazo (acaba antes o a más tardar a esa hora).<br>✔️ <i>Wait <b>until</b> 5 pm.</i> (quédate de corrido).<br>✔️ <i>Finish <b>by</b> 5 pm.</i> (a más tardar a las 5)."
+      },
+      {
+        title: "3. While + Verbo en -ing",
+        body: "Si el sujeto hace las dos acciones al mismo tiempo, puedes omitir 'sujeto + verbo be' y conectar directo con -ing:<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
+      },
+      {
+        title: "4. Since como «Ya que / Dado que»",
+        body: "Además de tiempo ('desde'), en inglés formal <b>since</b> significa 'dado que' o 'puesto que':<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i> (Ya que llueve, quedémonos en casa)."
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "antes de", tl: ["A", "B", "before"],
+        rule: "Se usa para algo que pasa primero. Después puede ir un sustantivo, un verbo con -ing o una frase completa.",
+        ex: [
+          ["Wash your hands before lunch.", "Lávate las manos antes del almuerzo."],
+          ["Think before speaking.", "Piensa antes de hablar."],
+          ["Call me before you leave.", "Llámame antes de que te vayas."]
+        ],
+        tip: "Con una frase, usa presente para el futuro: «before you leave», no «before you will leave»."
+      },
+      {
+        w: "after", meaning: "después de", tl: ["A", "B", "after"],
+        rule: "Es lo contrario de before. Indica lo que pasa más tarde. Igual que before, admite sustantivo, -ing o frase.",
+        ex: [
+          ["We played football after school.", "Jugamos al fútbol después de la escuela."],
+          ["After finishing, he went home.", "Después de terminar, se fue a casa."],
+          ["I’ll rest after I eat.", "Descansaré después de comer."]
+        ],
+        tip: "Si hablas del futuro, también va en presente: «after I finish»."
+      },
+      {
+        w: "during", meaning: "durante (en el transcurso de)", tl: ["inicio", "fin", "during"],
+        rule: "Dice cuándo pasa algo dentro de un periodo o evento específico. Solo va seguido de sustantivo, nunca de sujeto + verbo.",
+        ex: [
+          ["I fell asleep during the movie.", "Me dormí durante la película."],
+          ["It rains a lot during winter.", "Llueve mucho durante el invierno."],
+          ["Please be quiet during the exam.", "Por favor, silencio durante el examen."],
+          ["I woke up twice during the night.", "Me desperté dos veces durante la noche."]
+        ],
+        tip: "No uses during para cantidades de horas o años: no digas «during three hours», di «for three hours»."
+      },
+      {
+        w: "while", meaning: "mientras", tl: ["acción 1", "acción 2", "while"],
+        rule: "Une dos acciones que ocurren al mismo tiempo. Lleva sujeto y verbo, o directamente un verbo en -ing si el sujeto es el mismo.",
+        ex: [
+          ["I read while she cooks.", "Leo mientras ella cocina."],
+          ["The phone rang while I was sleeping.", "Sonó el teléfono mientras dormía."],
+          ["Don’t text while driving.", "No envíes mensajes mientras manejas."]
+        ],
+        tip: "While suele acompañar el pasado continuo (was/were + -ing) o formas abreviadas (while + -ing)."
+      },
+      {
+        w: "since", meaning: "desde", tl: ["pasado", "ahora", "since"],
+        rule: "Marca el punto donde algo empezó y todavía continúa. Se usa casi siempre con present perfect (have/has + participio).",
+        ex: [
+          ["I have lived here since 2018.", "Vivo aquí desde 2018."],
+          ["She has been tired since Monday.", "Está cansada desde el lunes."],
+          ["We have been friends since we were kids.", "Somos amigos desde que éramos niños."]
+        ],
+        tip: "Since = punto de inicio (2018, Monday). Para duración total usa for (for three years). En oraciones causales, since también traduce 'ya que'."
+      },
+      {
+        w: "until", meaning: "hasta", tl: ["ahora", "fin", "until"],
+        rule: "Indica el momento en que una acción continua termina. Puede ir con una hora, un día o una frase.",
+        ex: [
+          ["The shop is open until 9 pm.", "La tienda abre hasta las 9 pm."],
+          ["Wait here until I come back.", "Espera aquí hasta que vuelva."],
+          ["I didn’t sleep until midnight.", "No me dormí hasta la medianoche."]
+        ],
+        tip: "Diferencia con 'by': 'until' es continuar haciendo algo hasta esa hora; 'by' es terminar algo a más tardar a esa hora."
+      }
+    ],
+    explanations: {
+      ex: [
+        "Antes de + verbo con -ing: primero te lavas los dientes.",
+        "Después hay un sustantivo (the lesson), sin verbo: durante.",
+        "Esperas de forma continua hasta el momento en que termina: until.",
+        "Present perfect + punto de inicio (2019): since.",
+        "Dos acciones a la vez y una frase con sujeto + verbo: while.",
+        "Primero la cena y luego los platos: después de.",
+        "«the whole flight» es un sustantivo: during.",
+        "Desde que éramos niños: punto de inicio en el pasado.",
+        "Primero se leen las instrucciones: antes de usar.",
+        "Es la hora en que termina la acción continua: until.",
+        "Una acción larga (cocinaba) y otra que la interrumpe: while.",
+        "Sustantivo (the meeting) sin verbo: during.",
+        "Sujeto omitido con misma persona: 'while walking' (mientras caminas).",
+        "Punto de inicio en la infancia: since."
+      ],
+      qz: [
+        "Present perfect + día de inicio: since.",
+        "Primero apagas la luz y luego sales: before.",
+        "«the exam» es un sustantivo (evento): during.",
+        "Dos acciones a la vez con sujeto + verbo: while.",
+        "Se quedaron de corrido hasta ese momento: until.",
+        "Primero terminó el colegio y luego trabajó: after.",
+        "Punto de inicio (childhood) con present perfect: since.",
+        "Acción simultánea con frase completa: while.",
+        "not … until = no … hasta (recién a medianoche).",
+        "Sustantivo (the movie) sin verbo: during.",
+        "Acción simultánea abreviada con -ing: while driving.",
+        "Continuar esperando de forma ininterrumpida: until.",
+        "Evento/periodo con nombre (the storm): during.",
+        "Acción posterior a la reunión: after."
+      ]
+    }
+  },
+
+  en: {
+    meta: { name: "English", chooseOpt: "choose…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "An interactive, comprehensive masterclass on six essential English time words. Learn core structures, avoid common traps, test your understanding, and see full feedback.",
+      nav: ["Theory", "Common Traps", "Summary", "Exercises", "Quiz"],
+      sec1Title: "1. Core Theory & Key Nuances",
+      sec1Lead: "All of these words describe time relationships. Pay special attention to the grammatical structure following each word.",
+      secTrapsTitle: "⚠️ 4 Critical Traps to Avoid",
+      secTrapsLead: "The four most frequent pitfalls English learners face and how to bypass them:",
+      sec2Title: "2. Quick Summary Table",
+      sec3Title: "3. Practice Exercises",
+      sec3Lead: "Choose the correct time word in each sentence and click 'Check Answers'. Repeat as needed.",
+      sec4Title: "4. Master Quiz (14 Questions)",
+      sec4Lead: "14 targeted questions. Click 'Show My Score' to see your detailed breakdown and explanations.",
+      tableHeaders: ["Word", "Meaning", "Followed by…", "Example"],
+      tableRows: [
+        ["before", "earlier than / prior to", "noun, verb+ing, or clause", "Before lunch / before eating / before I eat"],
+        ["after", "later than / following", "noun, verb+ing, or clause", "After class / after leaving / after I leave"],
+        ["during", "within an event/period", "noun only (never subject+verb)", "during the film / during winter"],
+        ["while", "at the same time as", "clause (subject+verb) or verb-ing", "while she was driving / while driving"],
+        ["since", "from a starting point", "point in time (year, date, event)", "since 2020 / since I moved"],
+        ["until", "up to the point in time", "end point in time or clause", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>Golden Rule:</b> If followed by a noun without a verb, use <b>during</b>. If followed by subject + verb, use <b>while</b>.",
+      tipLabel: "Pro Tip:",
+      btnCheck: "Check Answers",
+      btnReset: "Reset",
+      btnGrade: "Show My Score",
+      btnRestart: "Start Over",
+      scoreText: (ok, total) => `Score: ${ok} out of ${total}`,
+      correctPrefix: "✓ Correct! ",
+      wrongMarked: (v) => `✗ You selected "${v}". `,
+      unanswered: "✗ Unanswered. ",
+      answerLabel: "Correct answer: ",
+      yourErrors: "Questions to review",
+      noErrors: "Outstanding! Perfect score with zero errors.",
+      scoreMsgs: [
+        "Flawless! You have mastered these time words and tricky traps.",
+        "Great job! Review just the few questions you missed.",
+        "Passed! Review the grammar notes for your mistakes and try again.",
+        "Keep practicing! Revisit the theory section and retry the exercises."
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For",
+        body: "<b>During</b> answers <i>when?</i> (a named event or period: during the movie). <b>For</b> answers <i>how long?</i> (quantities/numbers: for 8 hours).<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By",
+        body: "<b>Until</b> marks a <i>continuous</i> action continuing up to that moment. <b>By</b> indicates a <i>deadline</i> (at or before that point).<br>✔️ <i>Wait <b>until</b> 5 pm.</i> (stay continuous).<br>✔️ <i>Finish <b>by</b> 5 pm.</i> (latest deadline)."
+      },
+      {
+        title: "3. While + Verb-ing",
+        body: "When both actions are performed by the same subject, you can omit the subject + be verb and connect directly to -ing:<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
+      },
+      {
+        title: "4. Since as 'Because / Seeing that'",
+        body: "Beyond time, in formal and conversational English <b>since</b> frequently functions as a causal conjunction meaning 'because':<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i>"
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "earlier than", tl: ["Event A", "Event B", "before"],
+        rule: "Indicates that something happens first. Can be followed by a noun, a verb ending in -ing, or a complete clause.",
+        ex: [
+          ["Wash your hands before lunch.", "Wash hands first, lunch second."],
+          ["Think before speaking.", "Think first, then speak."],
+          ["Call me before you leave.", "Call me prior to departure."]
+        ],
+        tip: "When followed by a clause referring to the future, use the present tense: 'before you leave', not 'before you will leave'."
+      },
+      {
+        w: "after", meaning: "later than", tl: ["Event A", "Event B", "after"],
+        rule: "The opposite of before. Shows that an action occurs subsequent to another. Accepts a noun, verb+ing, or full clause.",
+        ex: [
+          ["We played football after school.", "School finished first, then we played."],
+          ["After finishing, he went home.", "He finished first, then headed home."],
+          ["I’ll rest after I eat.", "Eating happens first, resting follows."]
+        ],
+        tip: "Like before, clauses referring to future time stay in simple present: 'after I finish'."
+      },
+      {
+        w: "during", meaning: "within a period", tl: ["Start", "End", "during"],
+        rule: "Tells us when something happens inside a specified timeframe or event. Always followed by a noun, never a subject and verb.",
+        ex: [
+          ["I fell asleep during the movie.", "Fell asleep in the middle of the film."],
+          ["It rains a lot during winter.", "Rain occurs throughout the winter season."],
+          ["Please be quiet during the exam.", "Maintain silence for the duration of the test."],
+          ["I woke up twice during the night.", "Woke up in the middle of the night."]
+        ],
+        tip: "Do not use during with numbers of hours: say 'for three hours', not 'during three hours'."
+      },
+      {
+        w: "while", meaning: "at the same time", tl: ["Action 1", "Action 2", "while"],
+        rule: "Connects two actions taking place simultaneously. Followed by a clause or directly by -ing if the subject is identical.",
+        ex: [
+          ["I read while she cooks.", "Both reading and cooking occur at the same time."],
+          ["The phone rang while I was sleeping.", "The call interrupted the ongoing sleep."],
+          ["Don’t text while driving.", "Do not write messages while operating a car."]
+        ],
+        tip: "While frequently pairs with continuous tenses (e.g., was/were + verb-ing) or reduced clauses (while + -ing)."
+      },
+      {
+        w: "since", meaning: "from a starting point", tl: ["Past Point", "Now", "since"],
+        rule: "Indicates the exact starting point of an action continuing into the present. Used with present perfect.",
+        ex: [
+          ["I have lived here since 2018.", "Started living here in 2018 and still live here."],
+          ["She has been tired since Monday.", "Tiredness began on Monday and persists."],
+          ["We have been friends since we were kids.", "Friendship originated in childhood."]
+        ],
+        tip: "'Since' marks a starting point (since 2018). For duration, use 'for' (for three years)."
+      },
+      {
+        w: "until", meaning: "up to the point of", tl: ["Now", "End point", "until"],
+        rule: "Marks the terminal point or deadline when an ongoing action ceases. Followed by a time, date, or clause.",
+        ex: [
+          ["The shop is open until 9 pm.", "Open continuously up to 9 pm."],
+          ["Wait here until I come back.", "Remain in this spot up to my arrival."],
+          ["I didn’t sleep until midnight.", "Sleep only occurred once midnight arrived."]
+        ],
+        tip: "Contrast with 'by': 'until' means the continuous action carries on up to that moment."
+      }
+    ],
+    explanations: {
+      ex: [
+        "Before + verb-ing: washing your hands comes first.",
+        "Followed by a pure noun ('the lesson') without a verb: use 'during'.",
+        "Waiting continuously up to completion: use 'until'.",
+        "Present perfect tense + starting point (2019): requires 'since'.",
+        "Two concurrent actions with subject + verb ('we were eating'): use 'while'.",
+        "Dinner happened first, then the dishes: use 'after'.",
+        "'the whole flight' is a noun phrase without a verb: use 'during'.",
+        "Starting point in childhood continuing to present: use 'since'.",
+        "First step is reading the manuals: 'before' using the machine.",
+        "Terminal closing hour of continuous opening: use 'until'.",
+        "Ongoing background action interrupted: use 'while'.",
+        "Noun phrase ('the meeting') without a verb: use 'during'.",
+        "Reduced clause with same subject: 'while walking'.",
+        "Starting point continuing up to now: 'since'."
+      ],
+      qz: [
+        "Present perfect + specific starting day: 'since'.",
+        "Turn off lights first, then exit the room: 'before'.",
+        "'the exam' is a noun event: use 'during'.",
+        "Concurrent actions with subject and verb: use 'while'.",
+        "Stayed continuously up to sunset: use 'until'.",
+        "Completed graduation first, then found a job: use 'after'.",
+        "Starting landmark (childhood) with present perfect: 'since'.",
+        "Concurrent event with a complete clause: 'while'.",
+        "'not ... until' = did not happen prior to midnight: 'until'.",
+        "Noun phrase without a verb: 'during'.",
+        "Shortened clause with -ing: 'while driving'.",
+        "Continuous ongoing wait: 'until'.",
+        "Named event/storm: 'during'.",
+        "Action taking place after the meeting: 'after'."
+      ]
+    }
+  },
+
+  "pt-BR": {
+    meta: { name: "Português (Brasil)", chooseOpt: "escolha…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "Curso interativo para dominar as 6 palavras temporais essenciais em inglês. Inclui teoria aprofundada, armadilhas comuns explicadas, exercícios práticos e simulado completo.",
+      nav: ["Teoria", "Armadilhas", "Resumo", "Exercícios", "Simulado"],
+      sec1Title: "1. Teoria e Regras Estruturais",
+      sec1Lead: "Todas essas palavras expressam relações temporais. Preste atenção na estrutura que vem depois de cada uma.",
+      secTrapsTitle: "⚠️ As 4 Armadilhas mais Frequentes",
+      secTrapsLead: "Os erros que quase todo mundo comete e como você nunca mais vai errar:",
+      sec2Title: "2. Resumo Rápido",
+      sec3Title: "3. Exercícios Práticos",
+      sec3Lead: "Escolha a palavra correta em cada frase e clique em 'Conferir'. Pratique quantas vezes quiser.",
+      sec4Title: "4. Simulado de Fixação (14 Questões)",
+      sec4Lead: "14 questões selecionadas. Ao terminar clique em 'Ver minha nota' para ver o resultado detalhado.",
+      tableHeaders: ["Palavra", "Significado", "Depois vem…", "Exemplo"],
+      tableRows: [
+        ["before", "antes de", "substantivo, verbo+ing ou oração", "Before lunch / before eating / before I eat"],
+        ["after", "depois de / após", "substantivo, verbo+ing ou oração", "After class / after leaving / after I leave"],
+        ["during", "durante (em evento)", "apenas substantivo (sem verbo)", "during the film / during winter"],
+        ["while", "enquanto", "oração (sujeito + verbo) ou verbo-ing", "while she was driving / while driving"],
+        ["since", "desde (ponto inicial)", "marco temporal (ano, dia, evento)", "since 2020 / since I moved"],
+        ["until", "até (ação contínua)", "momento final ou término", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>Regra prática:</b> se depois vier apenas um evento/substantivo sem verbo, use <b>during</b>. Se tiver sujeito + verbo, use <b>while</b>.",
+      tipLabel: "Dica:",
+      btnCheck: "Conferir",
+      btnReset: "Reiniciar",
+      btnGrade: "Ver minha nota",
+      btnRestart: "Refazer simulado",
+      scoreText: (ok, total) => `Acertos: ${ok} de ${total}`,
+      correctPrefix: "✓ Correto! ",
+      wrongMarked: (v) => `✗ Você marcou «${v}». `,
+      unanswered: "✗ Sem resposta. ",
+      answerLabel: "Resposta: ",
+      yourErrors: "Questões para revisar",
+      noErrors: "Parabéns! Você acertou todas as questões sem nenhum erro.",
+      scoreMsgs: [
+        "Perfeito! Você dominou completamente essas palavras.",
+        "Muito bem! Revise apenas as poucas dúvidas que errou.",
+        "Aprovado! Releia as explicações dos erros e repita o teste.",
+        "Ainda precisa de treino. Volte à teoria e aos exercícios práticos."
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For",
+        body: "<b>During</b> responde a <i>quando?</i> (em um evento: during the movie). <b>For</b> responde a <i>quanto tempo?</i> (números/duração: for 8 hours).<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By",
+        body: "<b>Until</b> expressa ação <i>contínua</i> até determinado momento (ficar até às 17h). <b>By</b> indica um prazo limite (concluir antes ou no máximo até lá).<br>✔️ <i>Wait <b>until</b> 5 pm.</i><br>✔️ <i>Finish <b>by</b> 5 pm.</i>"
+      },
+      {
+        title: "3. While + Verbo no -ing",
+        body: "Quando a mesma pessoa faz as duas ações, pode-se omitir 'sujeito + verbo be' e usar direto o -ing:<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
+      },
+      {
+        title: "4. Since como «Já que / Visto que»",
+        body: "Além de indicar tempo ('desde'), <b>since</b> também é amplamente usado com sentido causal:<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i> (Já que está chovendo, vamos ficar em casa)."
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "antes de", tl: ["A", "B", "before"],
+        rule: "Indica algo que acontece primeiro. Pode ser seguido de substantivo, verbo com terminação -ing ou oração inteira.",
+        ex: [
+          ["Wash your hands before lunch.", "Lave as mãos antes do almoço."],
+          ["Think before speaking.", "Pense antes de falar."],
+          ["Call me before you leave.", "Ligue para mim antes de você sair."]
+        ],
+        tip: "Com oração no sentido futuro usa-se o presente: «before you leave», não «before you will leave»."
+      },
+      {
+        w: "after", meaning: "depois de / após", tl: ["A", "B", "after"],
+        rule: "O oposto de before. Indica o que acontece mais tarde. Aceita substantivo, forma -ing ou oração.",
+        ex: [
+          ["We played football after school.", "Jogamos futebol depois da escola."],
+          ["After finishing, he went home.", "Depois de terminar, ele foi para casa."],
+          ["I’ll rest after I eat.", "Vou descansar depois de comer."]
+        ],
+        tip: "Da mesma forma, orações futuras ficam no presente: «after I finish»."
+      },
+      {
+        w: "during", meaning: "durante (em evento/período)", tl: ["início", "fim", "during"],
+        rule: "Indica quando algo ocorre dentro de um período ou evento. É acompanhado de substantivo, nunca de sujeito + verbo.",
+        ex: [
+          ["I fell asleep during the movie.", "Peguei no sono durante o filme."],
+          ["It rains a lot during winter.", "Chove muito durante o inverno."],
+          ["Please be quiet during the exam.", "Por favor, fiquem em silêncio durante o exame."],
+          ["I woke up twice during the night.", "Acordei duas vezes durante a noite."]
+        ],
+        tip: "Não use during com contagem de horas: não diga «during 3 hours», use «for 3 hours»."
+      },
+      {
+        w: "while", meaning: "enquanto", tl: ["ação 1", "ação 2", "while"],
+        rule: "Conecta duas ações que acontecem ao mesmo tempo. Exige oração com sujeito e verbo ou -ing com sujeito igual.",
+        ex: [
+          ["I read while she cooks.", "Eu leio enquanto ela cozinha."],
+          ["The phone rang while I was sleeping.", "O telefone tocou enquanto eu estava dormindo."],
+          ["Don’t text while driving.", "Não envie mensagens enquanto estiver dirigindo."]
+        ],
+        tip: "Combina frequentemente com o passado contínuo (was/were + -ing) ou forma reduzida (while + -ing)."
+      },
+      {
+        w: "since", meaning: "desde", tl: ["ponto passado", "agora", "since"],
+        rule: "Marca o ponto exato em que algo começou e continua até o presente. Geralmente usado com Present Perfect.",
+        ex: [
+          ["I have lived here since 2018.", "Moro aqui desde 2018."],
+          ["She has been tired since Monday.", "Ela está cansada desde segunda-feira."],
+          ["We have been friends since we were kids.", "Somos amigos desde que éramos crianças."]
+        ],
+        tip: "Since = marco inicial. Para duração, usa-se 'for' (for three years)."
+      },
+      {
+        w: "until", meaning: "até", tl: ["agora", "ponto final", "until"],
+        rule: "Expressa o término ou limite de uma ação contínua no tempo. Pode vir seguido de hora, dia ou oração.",
+        ex: [
+          ["The shop is open until 9 pm.", "A loja fica aberta até as 21h."],
+          ["Wait here until I come back.", "Espere aqui até eu voltar."],
+          ["I didn’t sleep until midnight.", "Não consegui dormir até a meia-noite."]
+        ],
+        tip: "Diferença com 'by': 'until' marca continuidade ininterrupta até aquele horário."
+      }
+    ],
+    explanations: {
+      ex: [
+        "Antes de + verbo no -ing: escovar os dentes vem em primeiro lugar.",
+        "Seguido de substantivo ('the lesson'), sem verbo: use during.",
+        "Esperar continuamente até o instante da conclusão: until.",
+        "Present perfect + marco inicial (2019): since.",
+        "Ações simultâneas com sujeito e verbo: while.",
+        "Primeiro o jantar e depois a louça: after.",
+        "«the whole flight» é um grupo nominal sem verbo: during.",
+        "Desde a infância (ponto de partida no passado): since.",
+        "Primeiro lê-se as instruções antes de usar o aparelho: before.",
+        "Horário de encerramento de ação contínua: until.",
+        "Ação contínua prolongada que foi interrompida: while.",
+        "Substantivo ('the meeting') sem verbo: during.",
+        "Oração reduzida com mesmo sujeito: 'while walking'.",
+        "Marco inicial de tempo até o presente: 'since'."
+      ],
+      qz: [
+        "Present perfect + dia inicial da semana: since.",
+        "Primeiro apagar as luzes e depois sair da sala: before.",
+        "«the exam» é um evento substantivo: during.",
+        "Duas ações simultâneas com sujeito e verbo ('I study'): while.",
+        "Permaneceram de forma contínua até o pôr do sol: until.",
+        "Primeiro concluiu a escola e em seguida arrumou emprego: after.",
+        "Marco inicial de infância com present perfect: since.",
+        "Ação simultânea em oração completa: while.",
+        "«not … until» expressa que só aconteceu na meia-noite: until.",
+        "Substantivo («the movie») desacompanhado de verbo: during.",
+        "Forma abreviada com verbo no -ing: while driving.",
+        "Espera contínua até a chegada: until.",
+        "Evento substantivo (the storm): during.",
+        "Ação após o término da reunião: after."
+      ]
+    }
+  },
+
+  ko: {
+    meta: { name: "한국어", chooseOpt: "선택…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "영어 시간 전치사·접속사 6종 완벽 마스터 강좌입니다. 심층 문법 규칙, 가장 자주 틀리는 4대 함정, 자동 채점 연습문제 및 14문항 마스터 시험을 제공합니다.",
+      nav: ["핵심 이론", "자주 틀리는 함정", "요약 정리", "연습 문제", "최종 시험"],
+      sec1Title: "1. 핵심 문법 및 상세 비교",
+      sec1Lead: "모두 시간을 나타내지만 뒤에 명사가 오는지, 주어+동사가 오는지, 어떤 시제와 결합하는지가 결정적입니다.",
+      secTrapsTitle: "⚠️ 학습자가 가장 많이 틀리는 4대 함정",
+      secTrapsLead: "시험이나 회화에서 헷갈리기 쉬운 핵심 구별법 정리:",
+      sec2Title: "2. 빠른 요약 표",
+      sec3Title: "3. 실전문맥 연습문제",
+      sec3Lead: "빈칸에 알맞은 단어를 선택하고 '정답 확인'을 누르세요. 무제한 재도전 가능합니다.",
+      sec4Title: "4. 종합 평가 시험 (14문항)",
+      sec4Lead: "총 14문항으로 구성되어 있습니다. '점수 확인하기'를 눌러 채점 결과와 상세 해설을 확인하세요.",
+      tableHeaders: ["단어", "한국어 의미", "뒤에 오는 형태", "대표 예문"],
+      tableRows: [
+        ["before", "~하기 전에", "명사, 동명사(-ing), 절(주어+동사)", "Before lunch / before eating / before I eat"],
+        ["after", "~한 후에", "명사, 동명사(-ing), 절(주어+동사)", "After class / after leaving / after I leave"],
+        ["during", "~동안에 (특정 사건)", "특정 기간 명사만 (동사 불가)", "during the film / during winter"],
+        ["while", "~하는 동안에 (동시 진행)", "절(주어+동사) 또는 verb-ing", "while she was driving / while driving"],
+        ["since", "~이래로 (시작 시점)", "시작점 명사 또는 과거 시제 절", "since 2020 / since I moved"],
+        ["until", "~까지 (상태 지속)", "종료 시점 (시간, 사건, 절)", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>황금 규칙:</b> 동사 없는 사건/명사가 오면 <b>during</b>, 주어+동사 문장이 오면 <b>while</b>을 선택하세요.",
+      tipLabel: "주의 사항:",
+      btnCheck: "정답 확인",
+      btnReset: "초기화",
+      btnGrade: "점수 확인하기",
+      btnRestart: "처음부터 다시",
+      scoreText: (ok, total) => `정답: ${ok} / ${total} 개`,
+      correctPrefix: "✓ 정답입니다! ",
+      wrongMarked: (v) => `✗ 선택한 답: "${v}". `,
+      unanswered: "✗ 미입력. ",
+      answerLabel: "정답: ",
+      yourErrors: "틀린 문제 및 해설",
+      noErrors: "완벽합니다! 모든 문제를 정답 처리했습니다.",
+      scoreMsgs: [
+        "만점입니다! 시간 전치사와 까다로운 함정까지 완벽히 마스터하셨습니다.",
+        "매우 훌륭합니다! 틀린 소수의 문제만 복습해 보세요.",
+        "합격입니다. 틀린 문장의 해설을 읽고 다시 시도해 보세요.",
+        "추가 학습이 필요합니다. 핵심 이론과 함정 정리 카드를 다시 읽어보세요."
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For (~동안)",
+        body: "<b>During</b>은 <i>'언제?'</i>를 나타내는 특정 기간/행사(during the movie)에 씁니다. <b>For</b>는 <i>'얼마나 오래?'</i>를 나타내는 숫자/시간 길이(for 8 hours)에 씁니다.<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By (~까지)",
+        body: "<b>Until</b>은 그때까지 동작이 <i>계속 지속</i>됨을 의미합니다(until 5 pm). <b>By</b>는 <i>마감 기한</i>(늦어도 그때까지 완료)을 의미합니다.<br>✔️ <i>Wait <b>until</b> 5 pm.</i> (5시까지 계속 기다림)<br>✔️ <i>Finish <b>by</b> 5 pm.</i> (늦어도 5시까지는 완료)"
+      },
+      {
+        title: "3. While + 동명사(-ing)",
+        body: "두 동작의 주어가 같을 경우, 주어와 be동사를 생략하고 바로 -ing를 붙일 수 있습니다:<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
+      },
+      {
+        title: "4. Since의 '이유(~때문에/이므로)' 용법",
+        body: "시간 기점 외에도 포멀한 문맥에서 <b>since</b>는 'because(~이므로/때문에)'의 의미로 널리 쓰입니다:<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i> (비가 오므로 집에 있자)."
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "~하기 전에", tl: ["사건 A", "사건 B", "before"],
+        rule: "어떤 일보다 먼저 일어나는 일을 나타냅니다. 명사, 동명사(-ing), 완전한 절이 모두 올 수 있습니다.",
+        ex: [
+          ["Wash your hands before lunch.", "점심 먹기 전에 손을 씻으세요."],
+          ["Think before speaking.", "말하기 전에 먼저 생각하세요."],
+          ["Call me before you leave.", "출발하기 전에 나에게 전화해 줘."]
+        ],
+        tip: "미래를 나타내는 절이라도 will을 쓰지 않고 현재시제를 씁니다: 'before you leave'."
+      },
+      {
+        w: "after", meaning: "~한 후에", tl: ["사건 A", "사건 B", "after"],
+        rule: "before의 반대말로, 나중에 일어나는 일을 나타냅니다. 명사, -ing, 절을 모두 취할 수 있습니다.",
+        ex: [
+          ["We played football after school.", "방과 후에 우리는 축구를 했습니다."],
+          ["After finishing, he went home.", "끝마친 뒤에 그는 집으로 갔습니다."],
+          ["I’ll rest after I eat.", "밥을 먹고 난 후에 쉴 예정입니다."]
+        ],
+        tip: "미래 표현도 현재시제로 씁니다: 'after I finish'."
+      },
+      {
+        w: "during", meaning: "~하는 동안에 (특정 기간)", tl: ["시작", "끝", "during"],
+        rule: "특정 사건이나 기간 중에 일어난 일을 가리킵니다. 반드시 명사만 오며 동사나 절은 올 수 없습니다.",
+        ex: [
+          ["I fell asleep during the movie.", "영화 상영 도중에 잠이 들었습니다."],
+          ["It rains a lot during winter.", "겨울철 동안에는 비가 많이 내립니다."],
+          ["Please be quiet during the exam.", "시험 시간 중에는 조용히 해 주세요."],
+          ["I woke up twice during the night.", "밤중에 두 번이나 잠에서 깼습니다."]
+        ],
+        tip: "시간 숫자가 오는 지속 기간에는 during 대신 for를 씁니다: 'for three hours'."
+      },
+      {
+        w: "while", meaning: "~하는 동안에 (동시 진행)", tl: ["행동 1", "행동 2", "while"],
+        rule: "두 동작이 동시에 일어날 때 씁니다. 주어+동사 절이나 주어가 같을 때 -ing 축약형이 옵니다.",
+        ex: [
+          ["I read while she cooks.", "그녀가 요리하는 동안 나는 책을 읽습니다."],
+          ["The phone rang while I was sleeping.", "내가 자고 있는 동안 전화벨이 울렸습니다."],
+          ["Don’t text while driving.", "운전 중에 문자를 보내지 마세요."]
+        ],
+        tip: "과거 진행형(was/were + -ing) 및 분사 축약(while + -ing)과 자주 결합합니다."
+      },
+      {
+        w: "since", meaning: "~이래로, ~부터", tl: ["과거 시작점", "현재", "since"],
+        rule: "과거 특정 시점에 시작되어 현재까지 이어지는 기점을 나타내며, 현재완료와 결합합니다.",
+        ex: [
+          ["I have lived here since 2018.", "2018년부터 줄곧 여기서 거주해 왔습니다."],
+          ["She has been tired since Monday.", "그녀는 월요일부터 계속 피곤한 상태입니다."],
+          ["We have been friends since we were kids.", "우리는 어릴 때부터 친구 사이입니다."]
+        ],
+        tip: "기간의 길이에는 for를 씁니다(for 3 years). 접속사로 '이유(~이므로)'를 나타내기도 합니다."
+      },
+      {
+        w: "until", meaning: "~까지 (지속)", tl: ["현재", "종료 시점", "until"],
+        rule: "동작이나 상태가 끊이지 않고 지속되는 최종 시점을 나타냅니다.",
+        ex: [
+          ["The shop is open until 9 pm.", "가게는 오후 9시까지 영업합니다."],
+          ["Wait here until I come back.", "내가 돌아올 때까지 여기서 기다려 주세요."],
+          ["I didn’t sleep until midnight.", "자정이 될 때까지 잠들지 못했습니다."]
+        ],
+        tip: "마감 시점을 뜻하는 'by'와 달리 'until'은 상태의 '지속'을 나타냅니다."
+      }
+    ],
+    explanations: {
+      ex: [
+        "before + 동명사(-ing): 잠자리에 들기 전에 이를 먼저 닦는 순서입니다.",
+        "뒤에 동사 없는 순수 명사(the lesson)가 오므로 during이 정답입니다.",
+        "끝나는 종료 시점까지 계속 기다리므로 until을 씁니다.",
+        "현재완료 시제 + 시작 연도(2019)가 결합하므로 since입니다.",
+        "두 동작이 동시 진행되며 주어+동사 절이 오므로 while입니다.",
+        "저녁 식사를 마친 후 설거지를 하는 순서이므로 after입니다.",
+        "'the whole flight'는 동사가 없는 명사구이므로 during을 씁니다.",
+        "어릴 적부터 현재까지 지속되는 기점이므로 since입니다.",
+        "기계를 사용하기 전에 먼저 설명서를 읽는 순서이므로 before입니다.",
+        "가게가 영업을 지속하는 종료 시각이므로 until입니다.",
+        "진행 중인 동작 도중 일어난 일이므로 while입니다.",
+        "동사 없는 회의 명사구(the meeting)이므로 during입니다.",
+        "주어가 같은 축약형 분사(-ing)이므로 while walking이 정답입니다.",
+        "과거 기점부터 지금까지 계속된 상태이므로 since입니다."
+      ],
+      qz: [
+        "현재완료 시제와 결합하는 요일 시작 시점이므로 since.",
+        "방을 나가기 전에 먼저 불을 꺼야 하므로 before.",
+        "'the exam'은 명사구이므로 during.",
+        "주어+동사(I study)가 동시 진행되므로 while.",
+        "일몰이라는 최종 시점까지 머물렀으므로 until.",
+        "학교를 마친 뒤 직장을 구한 선후 관계이므로 after.",
+        "유년기(childhood)라는 과거 시작 시점과 현재완료이므로 since.",
+        "완전한 절(you were away) 동안 일어난 일이므로 while.",
+        "not ... until 구문으로 자정이 되어서야 전화를 했다는 의미이므로 until.",
+        "동사 없는 명사(the movie)이므로 during.",
+        "주어가 생략된 -ing 축약 구문이므로 while.",
+        "도착할 때까지 계속 기다리라는 지속이므로 until.",
+        "명사 사건(the storm) 동안이므로 during.",
+        "회의가 끝난 이후의 일이므로 after."
+      ]
+    }
+  },
+
+  zh: {
+    meta: { name: "中文 (普通话)", chooseOpt: "请选择…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "英语六大核心时间介词/连词完整交互课程。深入剖析语法规则、四大最易混淆的语法陷阱，提供针对性练习与14题综合测试。",
+      nav: ["语法精讲", "常见陷阱", "速查总结", "随堂练习", "综合测验"],
+      sec1Title: "1. 语法深度精讲",
+      sec1Lead: "牢牢掌握这些词的关键在于：分析后面连接的是具体事件名词、时间长度数字，还是主谓完整的句子。",
+      secTrapsTitle: "⚠️ 英语学习者最常踩的4大陷阱",
+      secTrapsLead: "彻底厘清容易扣分的盲点：",
+      sec2Title: "2. 快速总结表",
+      sec3Title: "3. 针对性练习",
+      sec3Lead: "在下拉框中选择正确的词汇，点击“核对答案”。可随意重置重试。",
+      sec4Title: "4. 综合过关测验 (14题)",
+      sec4Lead: "包含14道精心设计的题目。完成后点击“查看成绩”，获取详细分数与解析。",
+      tableHeaders: ["单词", "中文含义", "后接语法成分", "典型例句"],
+      tableRows: [
+        ["before", "在…之前", "名词、动名词(-ing) 或 完整句子", "Before lunch / before eating / before I eat"],
+        ["after", "在…之后", "名词、动名词(-ing) 或 完整句子", "After class / after leaving / after I leave"],
+        ["during", "在…期间 (特定事件)", "纯名词（指某个时期或事件）", "during the film / during winter"],
+        ["while", "正当…时 (同时发生)", "句子 (主谓) 或 动名词(-ing)", "while she was driving / while driving"],
+        ["since", "自…以来 (起始点)", "起点时间 (年份、日期、过去从句)", "since 2020 / since I moved"],
+        ["until", "直到…为止 (持续动作)", "终止时间点 或 句子", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>黄金法则：</b>若后面是无动词的名词/事件，用 <b>during</b>；若后面是主谓完整的句子，用 <b>while</b>。",
+      tipLabel: "特别提示：",
+      btnCheck: "核对答案",
+      btnReset: "重置",
+      btnGrade: "查看成绩",
+      btnRestart: "重新测试",
+      scoreText: (ok, total) => `答对: ${ok} / ${total} 题`,
+      correctPrefix: "✓ 正确！ ",
+      wrongMarked: (v) => `✗ 您选择了 “${v}”。 `,
+      unanswered: "✗ 未作答。 ",
+      answerLabel: "正确答案：",
+      yourErrors: "错题回顾与解析",
+      noErrors: "太棒了！全对无任何错误！",
+      scoreMsgs: [
+        "满分！你已经彻底掌握了这组时间词汇及所有易错陷阱。",
+        "非常出色！稍作复习错题即可。",
+        "已及格！请仔细查看错题解析并重新练习一次。",
+        "还需继续努力。建议重新阅读理论解析并重做练习题。"
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For (在…期间/长达)",
+        body: "<b>During</b> 回答 <i>when? (何时)</i>，后接特定事件名词(during the movie)。<b>For</b> 回答 <i>how long? (多久)</i>，后接具体时间长度数字(for 8 hours)。<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By (直到 vs. 不迟于/截止)",
+        body: "<b>Until</b> 表示动作<i>持续不断</i>进行至某一刻。<b>By</b> 表示<i>截止日期/期限</i>（动作在此时刻前或最迟在此时刻完成）。<br>✔️ <i>Wait <b>until</b> 5 pm.</i> (一直等)<br>✔️ <i>Finish <b>by</b> 5 pm.</i> (最迟5点完成)"
+      },
+      {
+        title: "3. While + 动名词 (-ing)",
+        body: "当主句与从句主语相同时，可省略从句主语和be动词，直接接-ing：<br>✔️ <i>Be careful <b>while driving</b>.</i> (= while you are driving)."
+      },
+      {
+        title: "4. Since 表达“既然 / 因为”",
+        body: "除了表示时间的“自…以来”，<b>since</b> 在较正式语境中还常作为因果连词，相当于 because：<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i> (既然在下雨，我们就待在家里吧)。"
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "在…之前", tl: ["事件 A", "事件 B", "before"],
+        rule: "用于表示先发生的事情。其后可接名词、动名词（-ing）或者主谓完整的句子。",
+        ex: [
+          ["Wash your hands before lunch.", "午饭前要洗手。"],
+          ["Think before speaking.", "说话之前要三思。"],
+          ["Call me before you leave.", "你出发前给我打个电话。"]
+        ],
+        tip: "从句表示将来时用一般现在时替代将来时：「before you leave」。"
+      },
+      {
+        w: "after", meaning: "在…之后", tl: ["事件 A", "事件 B", "after"],
+        rule: "before的反义词，用于指出某事在另一件事之后发生。可接名词、-ing或句子。",
+        ex: [
+          ["We played football after school.", "放学后我们去踢了足球。"],
+          ["After finishing, he went home.", "完成后，他回家了。"],
+          ["I’ll rest after I eat.", "我吃完饭后会休息一下。"]
+        ],
+        tip: "指代未来的从句同样使用一般现在时：「after I finish」。"
+      },
+      {
+        w: "during", meaning: "在…期间", tl: ["开始", "结束", "during"],
+        rule: "说明某事发生在某个时期或特定事件的过程中。严格只接名词，绝不能接句子。",
+        ex: [
+          ["I fell asleep during the movie.", "看电影的过程中我睡着了。"],
+          ["It rains a lot during winter.", "冬季期间经常下雨。"],
+          ["Please be quiet during the exam.", "考试期间请保持安静。"],
+          ["I woke up twice during the night.", "夜里我醒了两次。"]
+        ],
+        tip: "不可后接具体几小时等数字：不可说「during three hours」，应说「for three hours」。"
+      },
+      {
+        w: "while", meaning: "正当…时 (同时)", tl: ["动作 1", "动作 2", "while"],
+        rule: "连接两件同时发生的动作。后接主谓句子，或在主语一致时直接接-ing形式。",
+        ex: [
+          ["I read while she cooks.", "她做饭时我在看书。"],
+          ["The phone rang while I was sleeping.", "我睡觉时电话响了。"],
+          ["Don’t text while driving.", "开车时切勿发短信。"]
+        ],
+        tip: "常与进行时态（was/were + -ing）或省略句（while + -ing）搭配。"
+      },
+      {
+        w: "since", meaning: "自…以来", tl: ["过去起点", "现在", "since"],
+        rule: "标明某事从过去具体时间点开始并延续至今。通常与现在完成时连用。",
+        ex: [
+          ["I have lived here since 2018.", "自2018年以来我就一直住在这里。"],
+          ["She has been tired since Monday.", "从周一开始她就一直很疲倦。"],
+          ["We have been friends since we were kids.", "我们从小就是朋友。"]
+        ],
+        tip: "表示持续时间长度用 for（如 for three years）。作连词时还可表示“既然”。"
+      },
+      {
+        w: "until", meaning: "直到…为止", tl: ["现在", "终止时间", "until"],
+        rule: "指示某持续动作直至终止的具体时刻。可接时间、日期或从句。",
+        ex: [
+          ["The shop is open until 9 pm.", "这家店一直营业到晚上9点。"],
+          ["Wait here until I come back.", "在这里等到我回来为止。"],
+          ["I didn’t sleep until midnight.", "我直到午夜才入睡。"]
+        ],
+        tip: "与 by 的区别：until 强调动作的持续，by 强调最终截止期限。"
+      }
+    ],
+    explanations: {
+      ex: [
+        "Before + 动名词(-ing)：睡前先刷牙，表示动作先后顺序。",
+        "其后是纯名词（the lesson）且无动词，填 during。",
+        "一直持续等待直至对方完成的时刻，用 until。",
+        "现在完成时 + 起始年份（2019），需用 since。",
+        "两件事情同时发生，且后接主谓句子，用 while。",
+        "先吃饭再洗碗，表示在…之后，用 after。",
+        "「the whole flight」是名词短语，用 during。",
+        "从童年起延续至今的起点，用 since。",
+        "使用机器前先阅读说明书，用 before。",
+        "营业终止的截止时间点，用 until。",
+        "较长的背景动作被电话打断，用 while。",
+        "纯名词短语（the meeting）没有动词，填 during。",
+        "主语相同的分词省略句，接-ing：while walking。",
+        "自起点延续至今的状态，填 since。"
+      ],
+      qz: [
+        "现在完成时与起始星期结合，用 since。",
+        "离开房间前先关灯，用 before。",
+        "「the exam」为特定事件名词，填 during。",
+        "同时进行的主谓句子（I study），用 while。",
+        "一直持续待到日落那一刻为止，用 until。",
+        "先完成学业随后找到工作，用 after。",
+        "童年起始点（childhood）搭配现在完成时，用 since。",
+        "在某人外出的完整时段内，用 while。",
+        "「not … until」句型，表示直到午夜才打电话，用 until。",
+        "名词短语（the movie）前填 during。",
+        "相同主语省略句，接动名词：while driving。",
+        "持续等待直至到达，填 until。",
+        "特定事件名词短语（the storm），填 during。",
+        "会议结束之后的动作，填 after。"
+      ]
+    }
+  },
+
+  ja: {
+    meta: { name: "日本語", chooseOpt: "選択…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "英語の時間を表す6つの必須表現を完全マスターするインタラクティブコース。詳細な解説、間違えやすい4大落とし穴、即時採点できる演習と14問の総合テストを収録。",
+      nav: ["理論解説", "重要注意点", "まとめ表", "練習問題", "確認テスト"],
+      sec1Title: "1. 理論と重要ポイント",
+      sec1Lead: "時間の表現で最も重要なのは「後ろに名詞が来るか、文（主語＋動詞）が来るか」、そして継続と期限の区別です。",
+      secTrapsTitle: "⚠️ 学習者が最も間違えやすい4大落とし穴",
+      secTrapsLead: "試験や英会話で誰もが一度は迷うポイントを徹底整理：",
+      sec2Title: "2. 早見まとめ表",
+      sec3Title: "3. 練習問題",
+      sec3Lead: "空欄に入る正しい単語を選び、「答え合わせ」を押してください。何度でもやり直せます。",
+      sec4Title: "4. 総合実力テスト (14問)",
+      sec4Lead: "全14問。解き終わったら「スコアを確認」をクリックして、点数と解説を確認しましょう。",
+      tableHeaders: ["単語", "意味", "後ろに続く形", "例文"],
+      tableRows: [
+        ["before", "〜の前に", "名詞、動名詞(-ing)、または節（主語+動詞）", "Before lunch / before eating / before I eat"],
+        ["after", "〜の後に", "名詞、動名詞(-ing)、または節（主語+動詞）", "After class / after leaving / after I leave"],
+        ["during", "〜の間に（特定行事）", "名詞のみ（特定の期間・行事）", "during the film / during winter"],
+        ["while", "〜している間に（同時進行）", "節（主語 + 動詞）または verb-ing", "while she was driving / while driving"],
+        ["since", "〜以来（起点）", "過去の起点（年、曜日、出来事）", "since 2020 / since I moved"],
+        ["until", "〜までずっと（継続）", "終了の時点（時刻、出来事など）", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>鉄則：</b>後ろが動詞のない名詞・イベントなら <b>during</b>、主語＋動詞の文なら <b>while</b> を選びます。",
+      tipLabel: "重要ポイント：",
+      btnCheck: "答え合わせ",
+      btnReset: "リセット",
+      btnGrade: "スコアを確認",
+      btnRestart: "もう一度挑戦",
+      scoreText: (ok, total) => `正解数: ${ok} / ${total} 問`,
+      correctPrefix: "✓ 正解です！ ",
+      wrongMarked: (v) => `✗ あなたの選択: 「${v}」。 `,
+      unanswered: "✗ 未回答。 ",
+      answerLabel: "正解: ",
+      yourErrors: "間違えた問題と解説",
+      noErrors: "素晴らしい！全問正解でミスはありません。",
+      scoreMsgs: [
+        "完璧です！これらの時間表現と落とし穴を完全にマスターしています。",
+        "素晴らしい成績です！間違えた問題だけ軽く復習しましょう。",
+        "合格です！解説を読んで理解を深め、再度満点を目指しましょう。",
+        "もう少し練習が必要です。基本理論と注意点カードをもう一度復習してみましょう。"
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For (〜の間)",
+        body: "<b>During</b>は <i>「いつ？（特定期間・行事）」</i>（during the movie）。<b>For</b>は <i>「どれくらいの長さ？（数字・期間）」</i>（for 8 hours）に使います。<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By (〜まで)",
+        body: "<b>Until</b>はその時点まで動作が<i>ずっと継続</i>することを示します（until 5 pm）。<b>By</b>は<i>期限（遅くともその時までに完了）</i>を表します。<br>✔️ <i>Wait <b>until</b> 5 pm.</i>（5時までずっと待つ）<br>✔️ <i>Finish <b>by</b> 5 pm.</i>（5時までに終える）"
+      },
+      {
+        title: "3. While + 動名詞 (-ing)",
+        body: "主語が同じ場合、主語とbe動詞を省略して直接-ingを続けることができます：<br>✔️ <i>Be careful <b>while driving</b>.</i>（運転中は気をつけなさい）。"
+      },
+      {
+        title: "4. Sinceの「〜なので（理由）」",
+        body: "「〜以来」という時間表現だけでなく、改まった英語では <b>since</b> は「〜だから（理由）」を表す接続詞としてもよく使われます：<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i>"
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "〜の前に", tl: ["出来事 A", "出来事 B", "before"],
+        rule: "時間的に先に起こる事柄を表します。後ろには名詞、-ing形、または主語＋動詞の節が来ます。",
+        ex: [
+          ["Wash your hands before lunch.", "昼食の前に手を洗いましょう。"],
+          ["Think before speaking.", "話す前によく考えなさい。"],
+          ["Call me before you leave.", "出発する前に私に電話してください。"]
+        ],
+        tip: "未来の事柄を表す節でも現在形を用います：「before you leave」。"
+      },
+      {
+        w: "after", meaning: "〜の後に", tl: ["出来事 A", "出来事 B", "after"],
+        rule: "beforeの対義語で、後に起こる事柄を表します。名詞、-ing形、節を後ろに取ることができます。",
+        ex: [
+          ["We played football after school.", "放課後にサッカーをしました。"],
+          ["After finishing, he went home.", "終わった後、彼は家に帰りました。"],
+          ["I’ll rest after I eat.", "食事をした後に休みます。"]
+        ],
+        tip: "未来の事柄を指す場合も現在時制にします：「after I finish」。"
+      },
+      {
+        w: "during", meaning: "〜の間に（期間・行事）", tl: ["開始", "終了", "during"],
+        rule: "ある特定の期間や行事の最中に何かが起こることを示します。後ろには必ず名詞が続きます。",
+        ex: [
+          ["I fell asleep during the movie.", "映画の上映中に寝てしまいました。"],
+          ["It rains a lot during winter.", "冬の間は雨がたくさん降ります。"],
+          ["Please be quiet during the exam.", "試験中は静かにしてください。"],
+          ["I woke up twice during the night.", "夜の間に2回目が覚めました。"]
+        ],
+        tip: "「3時間」のような時間の長さには for を使います：「for three hours」。"
+      },
+      {
+        w: "while", meaning: "〜している間に（同時進行）", tl: ["動作 1", "動作 2", "while"],
+        rule: "2つの動作が同時に起こっていることを表します。完全な節か、主語が同じなら-ing形が続きます。",
+        ex: [
+          ["I read while she cooks.", "彼女が料理を作っている間、私は本を読みます。"],
+          ["The phone rang while I was sleeping.", "寝ている最中に電話が鳴りました。"],
+          ["Don’t text while driving.", "運転中にスマホを操作してはいけません。"]
+        ],
+        tip: "whileは進行形（was/were + -ing）や分詞構文（while + -ing）と好相性です。"
+      },
+      {
+        w: "since", meaning: "〜以来、〜から", tl: ["過去の起点", "現在", "since"],
+        rule: "過去のある時点に始まり現在まで続いている動作の開始点を示します。現在完了形と共に使います。",
+        ex: [
+          ["I have lived here since 2018.", "2018年からずっとここに住んでいます。"],
+          ["She has been tired since Monday.", "彼女は月曜日からずっと疲れています。"],
+          ["We have been friends since we were kids.", "私たちは子どもの頃からの友人です。"]
+        ],
+        tip: "期間の長さには for を使います。接続詞として「〜なので」という理由も表します。"
+      },
+      {
+        w: "until", meaning: "〜までずっと（継続）", tl: ["現在", "終了点", "until"],
+        rule: "動作や状態が継続して終わる限界の時点を表します。時刻や曜日、節が続きます。",
+        ex: [
+          ["The shop is open until 9 pm.", "その店は夜9時まで営業しています。"],
+          ["Wait here until I come back.", "私が戻ってくるまでここで待っていてください。"],
+          ["I didn’t sleep until midnight.", "真夜中になるまで眠れませんでした。"]
+        ],
+        tip: "期限を表す「by」と異なり、「until」は動作の継続を意味します。"
+      }
+    ],
+    explanations: {
+      ex: [
+        "before + 動名詞(-ing)：寝る前にまず歯を磨く順番です。",
+        "動詞のない純粋な名詞（the lesson）が続くので during です。",
+        "終わるその瞬間までずっと待ち続けるため until です。",
+        "現在完了形＋過去の起点（2019）なので since です。",
+        "2つの動作が同時に進行し、主語＋動詞が続くので while です。",
+        "夕食が先で皿洗いが後なので after です。",
+        "「the whole flight」は動詞のない名詞句なので during です。",
+        "子どもの頃から現在までの起点を示すので since です。",
+        "機械を使う前にまず説明書を読むので before です。",
+        "営業が継続する終了時刻を示すので until です。",
+        "料理中という継続動作の最中に電話が鳴ったので while です。",
+        "動詞のない名詞句（the meeting）なので during です。",
+        "主語が共通した短縮分詞構文（-ing）なので while walking です。",
+        "過去の起点から現在まで継続しているため since です。"
+      ],
+      qz: [
+        "現在完了＋曜日の起点なので since。",
+        "部屋を出る前にまず明かりを消すので before。",
+        "「the exam」は特定行事の名詞句なので during。",
+        "主語＋動詞（I study）が同時進行するので while。",
+        "日没という終了時点まで滞在し続けたので until。",
+        "学校を卒業した後に就職したので after。",
+        "幼少期（childhood）という起点と現在完了なので since。",
+        "不在だった期間全体を表す完全な節なので while。",
+        "not ... until構文で「真夜中になってやっと電話した」の意味なので until。",
+        "動詞のない名詞句（the movie）なので during。",
+        "主語が共通の-ing短縮構文なので while driving。",
+        "戻ってくるまで継続して待つため until。",
+        "特定事象（the storm）なので during。",
+        "会議が終わった後の出来事なので after。"
+      ]
+    }
+  },
+
+  ml: {
+    meta: { name: "മലയാളം", chooseOpt: "തിരഞ്ഞെടുക്കൂ…" },
+    ui: {
+      title: "Before, after, during, while, since, until",
+      intro: "ഇംഗ്ലീഷിലെ സമയസൂചക വാക്കുകൾ എളുപ്പത്തിൽ പഠിക്കാനുള്ള സമഗ്ര കോഴ്സ്. വ്യാകരണ നിയമങ്ങൾ, സാധാരണയായി വരുന്ന 4 പ്രധാന തെറ്റുകൾ, പരിശീലന ചോദ്യങ്ങൾ, കൂടാതെ 14 മാർക്കിന്റെ പരീക്ഷയും.",
+      nav: ["വ്യാകരണം", "പ്രധാന തെറ്റുകൾ", "ചുരുക്കപ്പട്ടിക", "പരിശീലനം", "പരീക്ഷ"],
+      sec1Title: "1. വ്യാകരണ നിയമങ്ങളും വിശദീകരണങ്ങളും",
+      sec1Lead: "വാക്കിന് ശേഷം നാമമാണോ വാക്യമാണോ വരുന്നത് എന്ന് കൃത്യമായി മനസ്സിലാക്കുകയാണ് പ്രധാനം.",
+      secTrapsTitle: "⚠️ എപ്പോഴും വരുന്ന 4 പ്രധാന തെറ്റുകൾ",
+      secTrapsLead: "പഠിതാക്കൾക്ക് സാധാരണ തെറ്റുപറ്റുന്ന പ്രധാന കാര്യങ്ങൾ:",
+      sec2Title: "2. ചുരുക്കപ്പട്ടിക",
+      sec3Title: "3. പരിശീലന ചോദ്യങ്ങൾ",
+      sec3Lead: "ശരിയായ വാക്ക് തിരഞ്ഞെടുത്ത് 'ഉത്തരം പരിശോധിക്കൂ' അമർത്തുക.",
+      sec4Title: "4. സമഗ്ര പരീക്ഷ (14 ചോദ്യങ്ങൾ)",
+      sec4Lead: "14 ചോദ്യങ്ങൾ. പൂർത്തിയാക്കിയ ശേഷം 'മാർക്ക് അറിയൂ' അമർത്തുക.",
+      tableHeaders: ["വാക്ക്", "മലയാള അർത്ഥം", "ശേഷം വരുന്നത്", "ഉദാഹരണം"],
+      tableRows: [
+        ["before", "മുമ്പ്", "നാമം, verb+ing അല്ലെങ്കിൽ വാക്യം", "Before lunch / before eating / before I eat"],
+        ["after", "ശേഷം", "നാമം, verb+ing അല്ലെങ്കിൽ വാക്യം", "After class / after leaving / after I leave"],
+        ["during", "ആ സമയത്ത് (ഇടയിൽ)", "പ്രത്യേക സംഭവം/നാമം മാത്രം", "during the film / during winter"],
+        ["while", "ചെയ്യുന്ന സമയത്ത്", "വാക്യം (Subject+Verb) അല്ലെങ്കിൽ verb-ing", "while she was driving / while driving"],
+        ["since", "മുതൽ (തുടങ്ങിയ സമയം)", "തുടക്ക സമയം (വർഷം, ദിവസം, സംഭവം)", "since 2020 / since I moved"],
+        ["until", "വരെ (തുടർച്ചയായ കാര്യം)", "അവസാനിക്കുന്ന സമയം", "until 6 pm / until you come"]
+      ],
+      quickTip: "<b>ഓർക്കാൻ:</b> ശേഷം ക്രിയയില്ലാത്ത നാമമാണെങ്കിൽ <b>during</b>, വാക്യമാണെങ്കിൽ <b>while</b> ഉപയോഗിക്കുക.",
+      tipLabel: "പ്രത്യേകം ശ്രദ്ധിക്കുക:",
+      btnCheck: "ഉത്തരം പരിശോധിക്കൂ",
+      btnReset: "പുനഃക്രമീകരിക്കുക",
+      btnGrade: "മാർക്ക് അറിയൂ",
+      btnRestart: "വീണ്ടും തുടങ്ങുക",
+      scoreText: (ok, total) => `ലഭിച്ച മാർക്ക്: ${total}-ൽ ${ok}`,
+      correctPrefix: "✓ ശരിയുത്തരം! ",
+      wrongMarked: (v) => `✗ നിങ്ങൾ തിരഞ്ഞെടുത്തത് «${v}». `,
+      unanswered: "✗ ഉത്തരമെഴുതിയില്ല. ",
+      answerLabel: "ശരിയായ ഉത്തരം: ",
+      yourErrors: "വന്ന തെറ്റുകൾ",
+      noErrors: "അഭിനന്ദനങ്ങൾ! എല്ലാ ഉത്തരങ്ങളും ശരിയാണ്.",
+      scoreMsgs: [
+        "മികച്ചത്! നിങ്ങൾ ഈ വാക്കുകൾ പൂർണ്ണമായി പഠിച്ചു കഴിഞ്ഞു.",
+        "വളരെ നല്ലത്! തെറ്റിയ ചോദ്യങ്ങൾ മാത്രം ഒന്നുകൂടി നോക്കുക.",
+        "വിജയിച്ചു! തെറ്റുകളുടെ വിശദീകരണം വായിച്ച് ഒന്നുകൂടി പരീക്ഷ എഴുതുക.",
+        "കൂടുതൽ പരിശീലനം ആവശ്യമാണ്. വ്യാകരണ ഭാഗം വീണ്ടും വായിക്കുക."
+      ]
+    },
+    traps: [
+      {
+        title: "1. During vs. For",
+        body: "<b>During</b> ഒരു പ്രത്യേക സംഭവത്തെ സൂചിപ്പിക്കുന്നു (during the movie). എന്നാൽ സമയദൈർഘ്യത്തിന് (എത്ര മണിക്കൂർ/വർഷം) <b>for</b> ഉപയോഗിക്കണം.<br>❌ <i>I slept during 8 hours.</i><br>✔️ <i>I slept <b>for</b> 8 hours.</i>"
+      },
+      {
+        title: "2. Until vs. By",
+        body: "<b>Until</b> ആ സമയം വരെ ഒരു കാര്യം <i>തുടർച്ചയായി</i> നടക്കുന്നു എന്ന് കാണിക്കുന്നു. എന്നാൽ <b>By</b> എന്നാൽ അതിന് മുമ്പ് അല്ലെങ്കിൽ ആ സമയത്തിനുള്ളിൽ തീർക്കണം എന്ന അന്തിമ സമയപരിധിയാണ്.<br>✔️ <i>Wait <b>until</b> 5 pm.</i><br>✔️ <i>Finish <b>by</b> 5 pm.</i>"
+      },
+      {
+        title: "3. While + Verb-ing",
+        body: "ഒരേ വ്യക്തി തന്നെ രണ്ട് കാര്യങ്ങൾ ചെയ്യുമ്പോൾ subject ഒഴിവാക്കി direct ആയി -ing ഉപയോഗിക്കാം:<br>✔️ <i>Be careful <b>while driving</b>.</i>"
+      },
+      {
+        title: "4. Since എന്നാൽ 'കാരണം / ആയതുകൊണ്ട്'",
+        body: "സമയം പറയുന്നതിന് പുറമെ, 'ആയതുകൊണ്ട്' എന്ന അർത്ഥത്തിലും <b>since</b> ഉപയോഗിക്കാം:<br>✔️ <i><b>Since</b> it's raining, let's stay home.</i>"
+      }
+    ],
+    lessons: [
+      {
+        w: "before", meaning: "മുമ്പ്", tl: ["ആദ്യം", "രണ്ടാമത്", "before"],
+        rule: "ആദ്യം സംഭവിക്കുന്ന കാര്യത്തെ സൂചിപ്പിക്കുന്നു. നാമം, -ing ക്രിയ, അല്ലെങ്കിൽ വാക്യം വരാം.",
+        ex: [
+          ["Wash your hands before lunch.", "ഉച്ചഭക്ഷണത്തിന് മുമ്പ് കൈ കഴുകുക."],
+          ["Think before speaking.", "സംസാരിക്കുന്നതിന് മുമ്പ് ചിന്തിക്കുക."],
+          ["Call me before you leave.", "പോകുന്നതിന് മുമ്പ് എന്നെ വിളിക്കൂ."]
+        ],
+        tip: "ഭാവികാര്യങ്ങൾക്കും present tense ആണ് ഉപയോഗിക്കേണ്ടത്: «before you leave»."
+      },
+      {
+        w: "after", meaning: "ശേഷം", tl: ["ആദ്യം", "രണ്ടാമത്", "after"],
+        rule: "പിന്നീട് നടക്കുന്ന കാര്യത്തെ സൂചിപ്പിക്കുന്നു. നാമം, -ing ക്രിയ, അല്ലെങ്കിൽ വാക്യം വരാം.",
+        ex: [
+          ["We played football after school.", "സ്കൂൾ കഴിഞ്ഞ ശേഷം ഞങ്ങൾ ഫുട്ബോൾ കളിച്ചു."],
+          ["After finishing, he went home.", "പണി തീർത്ത ശേഷം അവൻ വീട്ടിൽ പോയി."],
+          ["I’ll rest after I eat.", "ഭക്ഷണം കഴിച്ച ശേഷം ഞാൻ വിശ്രമിക്കും."]
+        ],
+        tip: "ഭാവികാല വാക്യങ്ങളിലും present tense ഉപയോഗിക്കുന്നു: «after I finish»."
+      },
+      {
+        w: "during", meaning: "ആ സമയത്ത് (ഇടയിൽ)", tl: ["തുടക്കം", "ഒടുക്കം", "during"],
+        rule: "ഒരു സംഭവത്തിന്റെ ഇടയിൽ എന്തെങ്കിലും നടക്കുമ്പോൾ ഉപയോഗിക്കുന്നു. നാമം മാത്രമേ വരാവൂ.",
+        ex: [
+          ["I fell asleep during the movie.", "സിനിമ കണ്ടുകൊണ്ടിരുന്നപ്പോൾ ഞാൻ ഉറങ്ങിപ്പോയി."],
+          ["It rains a lot during winter.", "ശീതകാലത്ത് ധാരാളം മഴ പെയ്യുന്നു."],
+          ["Please be quiet during the exam.", "പരീക്ഷാ സമയത്ത് ദയവായി നിശബ്ദത പാലിക്കുക."],
+          ["I woke up twice during the night.", "രാത്രിയിൽ ഞാൻ രണ്ടുതവണ ഉണർന്നു."]
+        ],
+        tip: "മണിക്കൂറുകൾ പറയുന്നതിന് 'for' ഉപയോഗിക്കുക: «for three hours»."
+      },
+      {
+        w: "while", meaning: "ചെയ്യുന്ന സമയത്ത്", tl: ["കാര്യം 1", "കാര്യം 2", "while"],
+        rule: "ഒരേ സമയം നടക്കുന്ന രണ്ട് പ്രവൃത്തികളെ ബന്ധിപ്പിക്കുന്നു. വാക്യമോ -ing രൂപമോ വരാം.",
+        ex: [
+          ["I read while she cooks.", "അവൾ പാചകം ചെയ്യുമ്പോൾ ഞാൻ വായിക്കുന്നു."],
+          ["The phone rang while I was sleeping.", "ഞാൻ ഉറങ്ങിക്കിടക്കുമ്പോൾ ഫോൺ അടിച്ചു."],
+          ["Don’t text while driving.", "വണ്ടി ഓടിക്കുമ്പോൾ മെസ്സേജ് അയക്കരുത്."]
+        ],
+        tip: "Past continuous അല്ലെങ്കിൽ while + -ing രൂപങ്ങളോടൊപ്പം ഉപയോഗിക്കുന്നു."
+      },
+      {
+        w: "since", meaning: "മുതൽ (തുടങ്ങിയ സമയം)", tl: ["കഴിഞ്ഞ സമയം", "ഇപ്പോൾ", "since"],
+        rule: "ഭൂതകാലത്തിൽ ഒരു കാര്യം ആരംഭിച്ച നിശ്ചിത സമയത്തെ സൂചിപ്പിക്കുന്നു.",
+        ex: [
+          ["I have lived here since 2018.", "ഞാൻ 2018 മുതൽ ഇവിടെ താമസിക്കുന്നു."],
+          ["She has been tired since Monday.", "തിങ്കളാഴ്ച മുതൽ അവൾ ക്ഷീണിതയാണ്."],
+          ["We have been friends since we were kids.", "കുട്ടിക്കാലം മുതൽ ഞങ്ങൾ സുഹൃത്തുക്കളാണ്."]
+        ],
+        tip: "കാലയളവിനെ സൂചിപ്പിക്കാൻ 'for' ഉപയോഗിക്കുന്നു (for three years)."
+      },
+      {
+        w: "until", meaning: "വരെ", tl: ["ഇപ്പോൾ", "അവസാനം", "until"],
+        rule: "തുടർച്ചയായി നടക്കുന്ന ഒരു കാര്യം അവസാനിക്കുന്ന സമയം വ്യക്തമാക്കുന്നു.",
+        ex: [
+          ["The shop is open until 9 pm.", "കട രാത്രി 9 മണി വരെ പ്രവർത്തിക്കും."],
+          ["Wait here until I come back.", "ഞാൻ തിരിച്ചുവരുന്നതുവരെ ഇവിടെ കാത്തിരിക്കൂ."],
+          ["I didn’t sleep until midnight.", "അർദ്ധരാത്രി വരെ എനിക്ക് ഉറങ്ങാൻ കഴിഞ്ഞില്ല."]
+        ],
+        tip: "ഒരു കാര്യം തുടർച്ചയായി നീണ്ടുനിൽക്കുന്നതിനെയാണ് until കാണിക്കുന്നത്."
+      }
+    ],
+    explanations: {
+      ex: [
+        "Before + -ing: ഉറങ്ങുന്നതിന് മുമ്പ് ആദ്യം പല്ല് തേക്കുന്നു.",
+        "ക്രിയയില്ലാത്ത നാമം ആയതിനാൽ 'during' ആണ് ഉത്തരം.",
+        "തീരുന്ന സമയം വരെ തുടർച്ചയായി കാത്തിരിക്കുന്നതിനാൽ 'until'.",
+        "Present perfect + ആരംഭ വർഷം: 'since'.",
+        "ഒരേ സമയത്തെ രണ്ട് കാര്യങ്ങൾ: 'while'.",
+        "ആദ്യം അത്താഴം, പിന്നീട് പാത്രം കഴുകൽ: 'after'.",
+        "'the whole flight' എന്നത് നാമമാണ്: 'during'.",
+        "കുട്ടിക്കാലം മുതലുള്ള തുടക്കം: 'since'.",
+        "യന്ത്രം ഉപയോഗിക്കുന്നതിന് മുമ്പ് നിർദ്ദേശം വായിക്കണം: 'before'.",
+        "കട അടയ്ക്കുന്ന സമയം: 'until'.",
+        "നടക്കുന്നതിനിടയിൽ മറ്റൊന്ന് സംഭവിച്ചു: 'while'.",
+        "ക്രിയയില്ലാത്ത നാമരൂപം: 'during'.",
+        "ഒരേ subject ഉള്ള -ing പ്രയോഗം: 'while walking'.",
+        "തുടക്ക സമയം മുതൽ ഇതുവരെ: 'since'."
+      ],
+      qz: [
+        "Present perfect + ആരംഭ ദിവസം: 'since'.",
+        "മുറി വിടുന്നതിന് മുമ്പ് ലൈറ്റ് അണയ്ക്കണം: 'before'.",
+        "'the exam' ഒരു നാമമാണ്: 'during'.",
+        "ഒപ്പം നടക്കുന്ന പ്രവർത്തി: 'while'.",
+        "സൂര്യാസ്തമയം വരെ തുടർന്നു: 'until'.",
+        "പഠനം കഴിഞ്ഞ ശേഷം ജോലി കിട്ടി: 'after'.",
+        "കുട്ടിക്കാലം എന്ന ആരംഭ സമയം: 'since'.",
+        "പൂർണ്ണ വാക്യത്തോടൊപ്പമുള്ള ഒരേ സമയത്തെ കാര്യം: 'while'.",
+        "അർദ്ധരാത്രി വരെ വിളിച്ചില്ല: 'until'.",
+        "ക്രിയയില്ലാത്ത നാമം: 'during'.",
+        "ചുരുക്കിയ -ing രൂപം: 'while driving'.",
+        "തുടർച്ചയായ കാത്തിരിപ്പ്: 'until'.",
+        "പ്രത്യേക സംഭവം (the storm): 'during'.",
+        "മീറ്റിംഗിന് ശേഷം: 'after'."
+      ]
+    }
+  }
+};
+
+const EX_SENTENCES = [
+  "Brush your teeth ___ going to bed.",
+  "___ the lesson, please turn off your phone.",
+  "I’ll wait here ___ you finish.",
+  "She has lived in Toronto ___ 2019.",
+  "We watched TV ___ we were eating dinner.",
+  "___ dinner, we washed the dishes.",
+  "He slept ___ the whole flight.",
+  "I have known her ___ we were kids.",
+  "Read the instructions ___ using the machine.",
+  "The shop is open ___ 9 pm.",
+  "___ I was cooking, the phone rang.",
+  "I felt tired ___ the meeting.",
+  "Be careful ___ walking on the ice.",
+  "He has been an engineer ___ graduating."
+];
+const EX_ANSWERS = ["before", "during", "until", "since", "while", "after", "during", "since", "before", "until", "while", "during", "while", "since"];
+
+const QZ_SENTENCES = [
+  "She has been sick ___ Monday.",
+  "Turn off the lights ___ you leave the room.",
+  "Don’t talk ___ the exam.",
+  "I listen to music ___ I study.",
+  "We stayed at the beach ___ sunset.",
+  "___ finishing school, he got a job.",
+  "They have been friends ___ childhood.",
+  "___ you were away, I took care of your cat.",
+  "He didn’t call ___ midnight.",
+  "We ate popcorn ___ the movie.",
+  "Never check your phone ___ driving.",
+  "I will stay at the office ___ my manager arrives.",
+  "The power went out ___ the storm.",
+  "___ the meeting, let's grab a coffee."
+];
+const QZ_ANSWERS = ["since", "before", "during", "while", "until", "after", "since", "while", "until", "during", "while", "until", "during", "after"];
+
+let CURRENT_LANG = "es";
+
+function setLanguage(lang) {
+  if (!I18N[lang]) lang = "en";
+  CURRENT_LANG = lang;
+  document.documentElement.lang = lang;
+  document.getElementById("langSelect").value = lang;
+  document.getElementById("langModal").classList.add("hidden");
+  renderAll();
+}
+
+function renderAll() {
+  const data = I18N[CURRENT_LANG];
+  const ui = data.ui;
+
+  document.getElementById("ui-title").textContent = ui.title;
+  document.getElementById("ui-intro").textContent = ui.intro;
+  document.getElementById("nav-teoria").textContent = ui.nav[0];
+  document.getElementById("nav-trampas").textContent = ui.nav[1];
+  document.getElementById("nav-resumen").textContent = ui.nav[2];
+  document.getElementById("nav-ejercicios").textContent = ui.nav[3];
+  document.getElementById("nav-examen").textContent = ui.nav[4];
+
+  document.getElementById("ui-sec1-title").textContent = ui.sec1Title;
+  document.getElementById("ui-sec1-lead").textContent = ui.sec1Lead;
+  document.getElementById("ui-sec-traps-title").textContent = ui.secTrapsTitle;
+  document.getElementById("ui-sec-traps-lead").textContent = ui.secTrapsLead;
+  document.getElementById("ui-sec2-title").textContent = ui.sec2Title;
+  document.getElementById("ui-sec3-title").textContent = ui.sec3Title;
+  document.getElementById("ui-sec3-lead").textContent = ui.sec3Lead;
+  document.getElementById("ui-sec4-title").textContent = ui.sec4Title;
+  document.getElementById("ui-sec4-lead").textContent = ui.sec4Lead;
+
+  document.getElementById("exBtn").textContent = ui.btnCheck;
+  document.getElementById("exReset").textContent = ui.btnReset;
+  document.getElementById("qzBtn").textContent = ui.btnGrade;
+  document.getElementById("qzReset").textContent = ui.btnRestart;
+  document.getElementById("ui-tip-box").innerHTML = ui.quickTip;
+
+  // Render Traps Cards
+  document.getElementById("trapsContainer").innerHTML = data.traps.map(t => `
+    <div class="trap-card">
+      <h3>${t.title}</h3>
+      <p>${t.body}</p>
+    </div>
+  `).join("");
+
+  // Summary Table
+  const ths = ui.tableHeaders.map(h => `<th>${h}</th>`).join("");
+  document.getElementById("tableHeader").innerHTML = ths;
+  const rows = ui.tableRows.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+  document.getElementById("tableBody").innerHTML = rows;
+
+  // Render Lessons
+  document.getElementById("lessons").innerHTML = data.lessons.map(l => `
+    <article class="lesson" id="l-${l.w}">
+      <h3>${l.w} <small>= ${l.meaning}</small></h3>
+      <p class="rule">${l.rule}</p>
+      <div class="tl"><b>${l.tl[0]}</b><i></i><em>${l.tl[2]}</em><i></i><b>${l.tl[1]}</b></div>
+      <ul>${l.ex.map(e => `<li>${e[0]} <span>— ${e[1]}</span></li>`).join("")}</ul>
+      <div class="tip"><b>${ui.tipLabel}</b> ${l.tip}</div>
+    </article>
+  `).join("");
+
+  buildExercises("ex", EX_SENTENCES, data.meta.chooseOpt);
+  buildExercises("qz", QZ_SENTENCES, data.meta.chooseOpt);
+
+  document.getElementById("exScore").textContent = "";
+  document.getElementById("result").style.display = "none";
+}
+
+function buildExercises(id, sentences, chooseText) {
+  document.getElementById(id).innerHTML = sentences.map((s, i) => {
+    const parts = s.split("___");
+    return `<li>
+      <span>${parts[0]}<select aria-label="Question ${i+1}"><option value="">${chooseText}</option>${W.map(w => `<option value="${w}">${w}</option>`).join("")}</select>${parts[1]}</span>
+      <span class="fb"></span>
+    </li>`;
+  }).join("");
+}
+
+function gradeExercises(id, sentences, answers, explanations, showFeedback) {
+  const ui = I18N[CURRENT_LANG].ui;
+  const items = [...document.querySelectorAll("#" + id + " li")];
+  let ok = 0;
+  const errs = [];
+
+  items.forEach((li, i) => {
+    const sel = li.querySelector("select");
+    const val = sel.value;
+    const isCorrect = val === answers[i];
+    const explanation = explanations[i];
+
+    if (isCorrect) {
+      ok++;
+    } else {
+      errs.push({
+        num: i + 1,
+        sentence: sentences[i].replace("___", "<b>" + answers[i] + "</b>"),
+        val: val,
+        why: explanation
+      });
+    }
+
+    if (showFeedback) {
+      li.className = isCorrect ? "ok" : "bad";
+      const fb = li.querySelector(".fb");
+      if (isCorrect) {
+        fb.innerHTML = ui.correctPrefix + explanation;
+      } else {
+        const markedPart = val ? ui.wrongMarked(val) : ui.unanswered;
+        fb.innerHTML = markedPart + ui.answerLabel + "<b>" + answers[i] + "</b>. " + explanation;
+      }
+    }
+  });
+
+  return { ok, total: sentences.length, errs };
+}
+
+function resetExercises(id) {
+  document.querySelectorAll("#" + id + " li").forEach(li => {
+    li.className = "";
+    li.querySelector("select").value = "";
+    li.querySelector(".fb").textContent = "";
+  });
+}
+
+document.getElementById("exBtn").onclick = () => {
+  const data = I18N[CURRENT_LANG];
+  const r = gradeExercises("ex", EX_SENTENCES, EX_ANSWERS, data.explanations.ex, true);
+  document.getElementById("exScore").textContent = data.ui.scoreText(r.ok, r.total);
+};
+
+document.getElementById("exReset").onclick = () => {
+  resetExercises("ex");
+  document.getElementById("exScore").textContent = "";
+};
+
+document.getElementById("qzBtn").onclick = () => {
+  const data = I18N[CURRENT_LANG];
+  const ui = data.ui;
+  const r = gradeExercises("qz", QZ_SENTENCES, QZ_ANSWERS, data.explanations.qz, false);
+  const total = r.total;
+  const score = r.ok;
+  const pct = Math.round((score / total) * 100);
+
+  let msg = ui.scoreMsgs[3];
+  if (score === total) msg = ui.scoreMsgs[0];
+  else if (score >= 11) msg = ui.scoreMsgs[1];
+  else if (score >= 8) msg = ui.scoreMsgs[2];
+
+  const box = document.getElementById("result");
+  box.style.display = "block";
+  box.innerHTML = `
+    <div class="big">${score}/${total}</div>
+    <p><b>${msg}</b> (${pct}%)</p>
+    ${r.errs.length 
+      ? `<h3>${ui.yourErrors}</h3>` + r.errs.map(e => `
+          <div class="err">
+            <b>Q${e.num}:</b> ${e.sentence}<br>
+            ${e.val ? ui.wrongMarked(e.val) : ui.unanswered} ${e.why}
+          </div>
+        `).join("")
+      : `<div class="good">${ui.noErrors}</div>`
+    }
+  `;
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+};
+
+document.getElementById("qzReset").onclick = () => {
+  resetExercises("qz");
+  document.getElementById("result").style.display = "none";
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  renderAll();
+});
+</script>
+</body>
+</html>
