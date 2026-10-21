@@ -1,8 +1,170 @@
 /**
  * app.js
  * Logic for Multilingual Prepositions Review & Training.
- * Fully supports all 7 languages: EN, ES, PT-BR, KO, ZH, JA, ML.
+ * Key enhancements:
+ *  - Fully translated explanations in all 7 languages.
+ *  - Dynamic option shuffling (correct answer is never locked to the 1st slot).
+ *  - Instant color feedback on practice (Green = correct, Orange = wrong).
+ *  - Neutral selection on exams (no colors until submission).
+ *  - Mobile responsive data-labels for summary table.
  */
+
+const RULE_EXPLANATIONS = {
+  en: {
+    to_dest: "Use 'to' for destination or movement toward a place.",
+    to_person: "Use 'to' to direct communication or action toward a person.",
+    at_time: "Use 'at' for exact clock times, noon, and night.",
+    at_spot: "Use 'at' for specific points or meeting locations.",
+    on_day: "Use 'on' for days of the week.",
+    on_date: "Use 'on' for specific calendar dates with a day.",
+    on_surface: "Use 'on' for physical contact with a surface.",
+    in_month: "Use 'in' for months of the year.",
+    in_year: "Use 'in' for calendar years.",
+    in_season: "Use 'in' for seasons of the year.",
+    in_part_day: "Use 'in' for parts of the day (in the morning/afternoon/evening).",
+    in_space: "Use 'in' for countries, cities, and inside enclosed rooms.",
+    for_dur: "Use 'for' with numbers of hours/days/years to express duration.",
+    before_seq: "Use 'before' for an action that happens earlier in sequence.",
+    after_seq: "Use 'after' for an action that happens later in sequence.",
+    during_noun: "Use 'during' followed by an event/period noun without a verb.",
+    while_clause: "Use 'while' with a full clause (subject + verb) or shortened -ing action.",
+    since_start: "Use 'since' with present perfect to mark a past starting point.",
+    until_end: "Use 'until' to mark a continuous action continuing up to that point.",
+    from_to: "Use 'from... to...' to express a range between two points."
+  },
+  es: {
+    to_dest: "Usa 'to' para indicar movimiento o destino hacia un lugar.",
+    to_person: "Usa 'to' para dirigir una comunicación o acción hacia una persona.",
+    at_time: "Usa 'at' para horas de reloj exactas, mediodía (noon) y noche (night).",
+    at_spot: "Usa 'at' para puntos de encuentro o ubicaciones específicas.",
+    on_day: "Usa 'on' para los días de la semana.",
+    on_date: "Usa 'on' para fechas del calendario que incluyen día y mes.",
+    on_surface: "Usa 'on' para contacto físico sobre una superficie.",
+    in_month: "Usa 'in' para los meses del año.",
+    in_year: "Usa 'in' para los años.",
+    in_season: "Usa 'in' para las estaciones del año.",
+    in_part_day: "Usa 'in' para partes del día (in the morning/afternoon/evening).",
+    in_space: "Usa 'in' para países, ciudades y dentro de espacios cerrados.",
+    for_dur: "Usa 'for' con cantidades de horas, días o años para indicar duración.",
+    before_seq: "Usa 'before' para lo que ocurre primero en el tiempo.",
+    after_seq: "Usa 'after' para lo que ocurre después o más tarde.",
+    during_noun: "Usa 'during' seguido de un sustantivo de evento sin verbo.",
+    while_clause: "Usa 'while' seguido de una frase completa (sujeto + verbo) o verbo en -ing.",
+    since_start: "Usa 'since' con presente perfecto para marcar el punto de inicio en el pasado.",
+    until_end: "Usa 'until' para indicar una acción continua que se mantiene hasta ese momento.",
+    from_to: "Usa 'from... to...' para expresar un rango entre dos puntos."
+  },
+  "pt-BR": {
+    to_dest: "Use 'to' para indicar movimento ou destino em direção a um lugar.",
+    to_person: "Use 'to' para direcionar comunicação ou ação para uma pessoa.",
+    at_time: "Use 'at' para horários exatos no relógio, meio-dia (noon) e noite (night).",
+    at_spot: "Use 'at' para pontos de encontro ou locais específicos.",
+    on_day: "Use 'on' para os dias da semana.",
+    on_date: "Use 'on' para datas específicas do calendário com dia e mês.",
+    on_surface: "Use 'on' para contato físico sobre superfícies.",
+    in_month: "Use 'in' para meses do ano.",
+    in_year: "Use 'in' para anos.",
+    in_season: "Use 'in' para estações do ano.",
+    in_part_day: "Use 'in' para turnos do dia (in the morning/afternoon/evening).",
+    in_space: "Use 'in' para países, cidades e dentro de ambientes fechados.",
+    for_dur: "Use 'for' com números de horas, dias ou anos para expressar duração.",
+    before_seq: "Use 'before' para algo que acontece primeiro no tempo.",
+    after_seq: "Use 'after' para algo que acontece depois.",
+    during_noun: "Use 'during' seguido de substantivo de evento sem verbo.",
+    while_clause: "Use 'while' seguido de oração completa (sujeito + verbo) ou forma -ing.",
+    since_start: "Use 'since' com Present Perfect para marcar o ponto inicial no passado.",
+    until_end: "Use 'until' para indicar uma ação contínua até aquele momento.",
+    from_to: "Use 'from... to...' para indicar intervalo entre dois pontos."
+  },
+  ko: {
+    to_dest: "장소나 목적지를 향한 이동에는 'to'를 씁니다.",
+    to_person: "사람에게 말하거나 행동을 전달할 때는 'to'를 씁니다.",
+    at_time: "정확한 시계 시각, 정오(noon), 밤(night)에는 'at'을 씁니다.",
+    at_spot: "특정 만남의 장소나 특정 지점에는 'at'을 씁니다.",
+    on_day: "요일 앞에는 'on'을 씁니다.",
+    on_date: "날짜와 월이 함께 있는 특정 날짜에는 'on'을 씁니다.",
+    on_surface: "표면과의 접촉에는 'on'을 씁니다.",
+    in_month: "월(month) 앞에는 'in'을 씁니다.",
+    in_year: "연도 앞에는 'in'을 씁니다.",
+    in_season: "계절 앞에는 'in'을 씁니다.",
+    in_part_day: "하루의 때(in the morning/afternoon/evening)에는 'in'을 씁니다.",
+    in_space: "국가, 도시 및 건물/공간 내부에는 'in'을 씁니다.",
+    for_dur: "숫자 시간(시간/일/년)으로 지속 기간을 나타낼 때는 'for'를 씁니다.",
+    before_seq: "순서상 먼저 일어나는 일에는 'before'를 씁니다.",
+    after_seq: "순서상 나중에 일어나는 일에는 'after'를 씁니다.",
+    during_noun: "동사 없는 특정 사건/기간 명사 앞에는 'during'을 씁니다.",
+    while_clause: "주어+동사를 갖춘 절이나 -ing 분사구문 앞에는 'while'을 씁니다.",
+    since_start: "현재완료와 함께 과거의 시작 시점을 나타낼 때는 'since'를 씁니다.",
+    until_end: "어떤 동작이 그 시점까지 지속됨을 나타낼 때는 'until'을 씁니다.",
+    from_to: "'from... to...'는 두 시점 사이의 범위를 나타냅니다."
+  },
+  zh: {
+    to_dest: "表示朝向地点或目的地的移动位移，用 'to'。",
+    to_person: "表示向某人说话或传达动作，用 'to'。",
+    at_time: "具体钟点、正午(noon)和夜间(night)用 'at'。",
+    at_spot: "具体相约地点或特定点位用 'at'。",
+    on_day: "星期几前用 'on'。",
+    on_date: "带具体日子的日历日期用 'on'。",
+    on_surface: "物体表面接触用 'on'。",
+    in_month: "月份前用 'in'。",
+    in_year: "年份前用 'in'。",
+    in_season: "季节前用 'in'。",
+    in_part_day: "一天中的时段 (in the morning/afternoon/evening) 用 'in'。",
+    in_space: "国家、城市以及封闭空间内部用 'in'。",
+    for_dur: "与小时/天/年等数字连用表示持续时长，用 'for'。",
+    before_seq: "表示时间顺序在先，用 'before'。",
+    after_seq: "表示时间顺序在后，用 'after'。",
+    during_noun: "后接不带动词的事件名词，用 'during'。",
+    while_clause: "后接主谓从句或-ing分词动作，用 'while'。",
+    since_start: "与现在完成时搭配标明过去起点，用 'since'。",
+    until_end: "表示动作持续进行直至该刻终止，用 'until'。",
+    from_to: "'from... to...' 表示从某点到某点的区间范围。"
+  },
+  ja: {
+    to_dest: "場所や目的地への移動を表すには 'to' を使います。",
+    to_person: "人に向かって話しかけたり行動を向けるには 'to' を使います。",
+    at_time: "正確な時刻、正午(noon)、夜(night)には 'at' を使います。",
+    at_spot: "特定の待ち合わせ場所やピンポイントの地点には 'at' を使います。",
+    on_day: "曜日には 'on' を使います。",
+    on_date: "日付けを含む特定の日には 'on' を使います。",
+    on_surface: "物理的な表面への接触には 'on' を使います。",
+    in_month: "月には 'in' を使います。",
+    in_year: "年には 'in' を使います。",
+    in_season: "季節には 'in' を使います。",
+    in_part_day: "1日の時間帯 (in the morning/afternoon/evening) には 'in' を使います。",
+    in_space: "国、都市、閉じた部屋の内部には 'in' を使います。",
+    for_dur: "時間・日・年などの数字を伴う継続期間には 'for' を使います。",
+    before_seq: "順序として先に起こることには 'before' を使います。",
+    after_seq: "順序として後に起こることには 'after' を使います。",
+    during_noun: "動詞のない特定の出来事・期間の名詞には 'during' を使います。",
+    while_clause: "主語＋動詞のある文や-ing形には 'while' を使います。",
+    since_start: "現在完了形と共に過去の開始点を示すには 'since' を使います。",
+    until_end: "その時点まで動作が継続することを示すには 'until' を使います。",
+    from_to: "'from... to...' は2点間の範囲を表します。"
+  },
+  ml: {
+    to_dest: "ഒരു സ്ഥലത്തേക്കുള്ള യാത്ര/ലക്ഷ്യം കാണിക്കാൻ 'to' ഉപയോഗിക്കുന്നു.",
+    to_person: "വ്യക്തിയോട് സംസാരിക്കാനോ ദിശ കാണിക്കാനോ 'to' ഉപയോഗിക്കുന്നു.",
+    at_time: "കൃത്യ സമയം, noon, night എന്നിവയ്ക്ക് 'at' ഉപയോഗിക്കുന്നു.",
+    at_spot: "കൃത്യമായ സ്ഥലത്തിന് 'at' ഉപയോഗിക്കുന്നു.",
+    on_day: "ആഴ്ചയിലെ ദിവസങ്ങൾക്ക് 'on' ഉപയോഗിക്കുന്നു.",
+    on_date: "തീയതികൾക്ക് 'on' ഉപയോഗിക്കുന്നു.",
+    on_surface: "ഉപരിതലത്തിന് 'on' ഉപയോഗിക്കുന്നു.",
+    in_month: "മാസങ്ങൾക്ക് 'in' ഉപയോഗിക്കുന്നു.",
+    in_year: "വർഷങ്ങൾക്ക് 'in' ഉപയോഗിക്കുന്നു.",
+    in_season: "കാലങ്ങൾക്ക് 'in' ഉപയോഗിക്കുന്നു.",
+    in_part_day: "ദിവസത്തിന്റെ ഭാഗങ്ങൾക്ക് (morning/afternoon/evening) 'in' ഉപയോഗിക്കുന്നു.",
+    in_space: "രാജ്യം, നഗരം, മുറികൾ എന്നിവയ്ക്ക് 'in' ഉപയോഗിക്കുന്നു.",
+    for_dur: "സമയ ദൈർഘ്യത്തിന് സംഖ്യയോടൊപ്പം 'for' ഉപയോഗിക്കുന്നു.",
+    before_seq: "ആദ്യം നടക്കുന്ന കാര്യത്തിന് 'before' ഉപയോഗിക്കുന്നു.",
+    after_seq: "പിന്നീട് നടക്കുന്ന കാര്യത്തിന് 'after' ഉപയോഗിക്കുന്നു.",
+    during_noun: "ക്രിയയില്ലാത്ത സംഭവ നാമത്തിന് 'during' ഉപയോഗിക്കുന്നു.",
+    while_clause: "വാക്യത്തോടൊപ്പമോ -ing രൂപത്തോടൊപ്പമോ 'while' ഉപയോഗിക്കുന്നു.",
+    since_start: "ഭൂതകാലത്തിലെ തുടക്ക സമയം കാണിക്കാൻ 'since' ഉപയോഗിക്കുന്നു.",
+    until_end: "ആ സമയം വരെ തുടർച്ചയായി നടക്കുന്നതിന് 'until' ഉപയോഗിക്കുന്നു.",
+    from_to: "'from... to...' എന്നാൽ രണ്ട് കാര്യങ്ങൾക്കിടയിലുള്ള സമയപരിധി."
+  }
+};
 
 const I18N = {
   en: {
@@ -19,7 +181,7 @@ const I18N = {
       secTrapsLead: "The four most frequent pitfalls English learners face and how to bypass them:",
       sec2Title: "2. Quick Summary Table",
       sec3Title: "3. Practice Exercises (Instant Feedback)",
-      sec3Lead: "Choose a preposition in each sentence. It will turn GREEN if correct and ORANGE if wrong instantly. Practice until confident!",
+      sec3Lead: "Choose a preposition in each sentence. It will turn GREEN if correct and ORANGE if wrong instantly with full explanations. Practice until confident!",
       sec4Title: "4. Final Level Exams (Randomized Pool)",
       sec4Lead: "Choose an exam level below. Each exam dynamically selects 15 random questions from our question pool. Colors remain neutral until you submit for your final score.",
       tableHeaders: ["Preposition", "Main Use", "Structure / Followed by", "Example"],
@@ -167,7 +329,7 @@ const I18N = {
       secTrapsLead: "Los errores que confunden a la mayoría de los estudiantes y cómo evitarlos:",
       sec2Title: "2. Resumen Rápido",
       sec3Title: "3. Ejercicios de Práctica (Corrección Inmediata)",
-      sec3Lead: "Elige la preposición en cada frase: se marcará en VERDE si es correcta y en NARANJO si no lo es. ¡Practica hasta dominarla!",
+      sec3Lead: "Elige la preposición en cada frase: se marcará en VERDE si es correcta y en NARANJO si no lo es, con su explicación completa. ¡Practica hasta dominarla!",
       sec4Title: "4. Exámenes Finales por Nivel (Preguntas Aleatorias)",
       sec4Lead: "Elige un examen. Cada intento selecciona 15 preguntas aleatorias del banco. En el examen las opciones elegidas NO cambian de color hasta que entregues para ver tu nota final.",
       tableHeaders: ["Preposición", "Uso Principal", "Estructura que sigue", "Ejemplo"],
@@ -315,7 +477,7 @@ const I18N = {
       secTrapsLead: "Erros clássicos e como evitá-los:",
       sec2Title: "2. Tabela de Resumo Rápido",
       sec3Title: "3. Exercícios de Prática (Correção Imediata)",
-      sec3Lead: "Escolha a preposição: ficará VERDE se estiver correta e LARANJA se estiver errada. Pratique à vontade!",
+      sec3Lead: "Escolha a preposição: ficará VERDE se estiver correta e LARANJA se estiver errada com explicação completa. Pratique à vontade!",
       sec4Title: "4. Exames Finais por Nível (Questões Aleatórias)",
       sec4Lead: "Cada exame seleciona 15 questões aleatórias. No exame, as opções NÃO mudam de cor até você finalizar.",
       tableHeaders: ["Preposição", "Uso Principal", "Estrutura / O que vem depois", "Exemplo"],
@@ -408,7 +570,7 @@ const I18N = {
       secTrapsLead: "시험에서 자주 헷갈리는 포인트 정리:",
       sec2Title: "2. 빠른 요약 표",
       sec3Title: "3. 실전 연습문제 (실시간 피드백)",
-      sec3Lead: "문장의 전치사를 선택하세요. 정답이면 즉시 초록색, 오답이면 주황색으로 표시됩니다!",
+      sec3Lead: "문장의 전치사를 선택하세요. 정답이면 즉시 초록색, 오답이면 주황색으로 표시되며 상세 설명이 제공됩니다!",
       sec4Title: "4. 레벨별 최종 시험 (무작위 15문항 출제)",
       sec4Lead: "원하는 시험을 선택하세요. 매 시도마다 15문항이 무작위로 추출됩니다. 시험 중에는 색상이 표시되지 않으며 최종 제출 시 점수가 산출됩니다.",
       tableHeaders: ["전치사", "주요 용도", "뒤에 오는 구조", "대표 예문"],
@@ -501,7 +663,7 @@ const I18N = {
       secTrapsLead: "直击扣分盲点，彻底理清疑难：",
       sec2Title: "2. 快速总结表",
       sec3Title: "3. 实战练习题 (即时反馈)",
-      sec3Lead: "在每题中选择介词：选对即刻变绿，选错即刻变橙，并显示详细解析。练到熟练为止！",
+      sec3Lead: "在每题中选择介词：选对即刻变绿，选错即刻变橙，并显示母语详细解析。练到熟练为止！",
       sec4Title: "4. 分级通关测试 (随机抽取15题)",
       sec4Lead: "请选择测试级别。每次点击都将从题库中随机抽取15题。答题过程中颜色保持中立，交卷后才会显示最终成绩与错题。",
       tableHeaders: ["介词", "核心用法", "后接语法成分", "典型例句"],
@@ -594,7 +756,7 @@ const I18N = {
       secTrapsLead: "日本人学習者がつまずきやすい重要ポイント：",
       sec2Title: "2. 早見まとめ表",
       sec3Title: "3. 実践練習（即時カラー判定）",
-      sec3Lead: "選択肢を選ぶと、正解は即座に【緑色】、不正解は【オレンジ色】に変化して解説が表示されます。自信がつくまで練習しましょう！",
+      sec3Lead: "選択肢を選ぶと、正解は即座に【緑色】、不正解は【オレンジ色】に変化して完全解説が表示されます。自信がつくまで練習しましょう！",
       sec4Title: "4. レベル別最終確認テスト（毎回ランダム15問）",
       sec4Lead: "各テストをクリックするたびに問題プールから15問がランダムに抽出されます。解答中は色が変化せず、最後に提出した時点で採点されます。",
       tableHeaders: ["前置詞", "主な用法", "後ろに続く構造", "例文"],
@@ -834,9 +996,15 @@ function renderUI() {
     </div>
   `).join("");
 
+  // Summary table with data-label for mobile card display
   document.getElementById("tableHeader").innerHTML = ui.tableHeaders.map(h => `<th>${h}</th>`).join("");
   document.getElementById("tableBody").innerHTML = ui.tableRows.map(r => `
-    <tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>
+    <tr>
+      <td data-label="${ui.tableHeaders[0]}"><b>${r[0]}</b></td>
+      <td data-label="${ui.tableHeaders[1]}">${r[1]}</td>
+      <td data-label="${ui.tableHeaders[2]}">${r[2]}</td>
+      <td data-label="${ui.tableHeaders[3]}">${r[3]}</td>
+    </tr>
   `).join("");
 
   document.getElementById("lessons").innerHTML = data.lessons.map(l => `
@@ -857,11 +1025,24 @@ function renderUI() {
 }
 
 /**
+ * Shuffle helper array
+ */
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+/**
  * Builds Practice List:
+ * - Shuffles the 4 options so the correct answer is NOT always first!
  * - Each item triggers onchange:
  *   - Green if correct
  *   - Orange if wrong
- *   - Updates live practice counter
+ *   - Multilingual translated feedback!
  */
 function buildPracticeList() {
   const data = I18N[CURRENT_LANG] || I18N["en"];
@@ -870,7 +1051,9 @@ function buildPracticeList() {
 
   container.innerHTML = WARMUP_DATA.map((item, i) => {
     const parts = item.s.split("___");
-    const optionsHtml = item.opts.map(opt => `<option value="${opt}">${opt}</option>`).join("");
+    // SHUFFLE OPTIONS so correct answer is NOT always 1st!
+    const randomizedOpts = shuffleArray(item.opts);
+    const optionsHtml = randomizedOpts.map(opt => `<option value="${opt}">${opt}</option>`).join("");
     return `<li id="p-item-${i}">
       <div class="q-row">
         <span class="q-num">${i+1}.</span>
@@ -902,12 +1085,16 @@ function checkPracticeItem(index, selectedVal) {
     return;
   }
 
+  // Get explanation in CURRENT LANGUAGE
+  const langRules = RULE_EXPLANATIONS[CURRENT_LANG] || RULE_EXPLANATIONS["en"];
+  const explanation = langRules[item.rule] || RULE_EXPLANATIONS["en"][item.rule] || "";
+
   if (selectedVal === item.a) {
     li.className = "practice-ok"; // GREEN
-    fb.innerHTML = ui.correctPrefix + item.exp;
+    fb.innerHTML = ui.correctPrefix + explanation;
   } else {
     li.className = "practice-wrong"; // ORANGE
-    fb.innerHTML = ui.wrongMarked(selectedVal) + ui.answerLabel + `<b>${item.a}</b>. ` + item.exp;
+    fb.innerHTML = ui.wrongMarked(selectedVal) + ui.answerLabel + `<b>${item.a}</b>. ` + explanation;
   }
 
   updatePracticeScore();
@@ -932,18 +1119,10 @@ document.getElementById("exReset").onclick = () => {
 
 /**
  * EXAM CONTROLLER:
- * - Selects 15 random questions from the level pool on every load
- * - Selects are neutral (NO color marking until submitted)
+ * - Samples 15 random questions from pool
+ * - Shuffles options for each question so correct answer is NOT always first!
+ * - Neutral selection until submitted
  */
-function shuffleArray(arr) {
-  const copy = [...arr];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
 function loadExam(examKey, scrollToView = true) {
   ACTIVE_EXAM_KEY = examKey;
   const pool = EXAMS_POOL[examKey] || [];
@@ -977,7 +1156,9 @@ function renderActiveExamQuestions() {
 
   container.innerHTML = ACTIVE_EXAM_QUESTIONS.map((item, i) => {
     const parts = item.s.split("___");
-    const optionsHtml = item.opts.map(opt => `<option value="${opt}">${opt}</option>`).join("");
+    // SHUFFLE OPTIONS so correct answer is NOT always 1st!
+    const randomizedOpts = shuffleArray(item.opts);
+    const optionsHtml = randomizedOpts.map(opt => `<option value="${opt}">${opt}</option>`).join("");
     return `<li>
       <div class="q-row">
         <span class="q-num">${i+1}.</span>
@@ -1005,6 +1186,7 @@ document.getElementById("qzSubmitBtn").onclick = () => {
   if (!ACTIVE_EXAM_KEY || ACTIVE_EXAM_QUESTIONS.length === 0) return;
   const data = I18N[CURRENT_LANG] || I18N["en"];
   const ui = data.ui;
+  const langRules = RULE_EXPLANATIONS[CURRENT_LANG] || RULE_EXPLANATIONS["en"];
   const listItems = [...document.querySelectorAll("#activeQzList li")];
 
   let ok = 0;
@@ -1015,6 +1197,7 @@ document.getElementById("qzSubmitBtn").onclick = () => {
     const val = sel.value;
     const item = ACTIVE_EXAM_QUESTIONS[i];
     const isCorrect = val === item.a;
+    const explanation = langRules[item.rule] || RULE_EXPLANATIONS["en"][item.rule] || "";
 
     if (isCorrect) {
       ok++;
@@ -1023,7 +1206,7 @@ document.getElementById("qzSubmitBtn").onclick = () => {
         num: i + 1,
         sentence: item.s.replace("___", `<b>${item.a}</b>`),
         val: val,
-        why: item.exp
+        why: explanation
       });
     }
   });
