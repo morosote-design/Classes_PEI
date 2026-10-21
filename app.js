@@ -250,7 +250,7 @@ const I18N = {
         w: "to", meaning: "destination / movement toward", tl: ["Origin", "to", "Destination"],
         rule: "Used to indicate movement, direction, or a destination toward a person, place, or goal.",
         ex: [["I walk to school every morning.", "Destination."], ["She moved to Canada last year.", "Country destination."], ["Talk to me after the meeting.", "Direction of communication."]],
-        tip: "Exception: Do not use 'to' with 'home': say 'go home', not 'go to home'."
+        tip: "'To' + Place/Person = Preposition (go to school, talk to me). 'To' + Verb = Infinitive/Action (want to learn, like to read). Exception: Never use 'to' with 'home' (say 'go home')."
       },
       {
         w: "at", meaning: "specific clock time / exact spot", tl: ["Exact Point", "at"],
@@ -398,7 +398,7 @@ const I18N = {
         w: "to", meaning: "a / hacia (destino o movimiento)", tl: ["Origen", "to", "Destino"],
         rule: "Indica movimiento, dirección o desplazamiento hacia un lugar, persona u objetivo.",
         ex: [["I walk to school every morning.", "Destino físico."], ["She moved to Canada last year.", "Hacia un país."], ["Talk to me after the meeting.", "Dirección hacia una persona."]],
-        tip: "Excepción importante: con 'home' nunca uses 'to'. Di 'go home', jamás 'go to home'."
+        tip: "'To' + Lugar/Persona = Preposición (go to school, talk to me). 'To' + Verbo = Infinitivo/Acción (want to learn, like to read). Ojo: con 'home' no se usa 'to' (se dice 'go home')."
       },
       {
         w: "at", meaning: "a las (hora) / en (lugar específico)", tl: ["Punto Exacto", "at"],
@@ -542,7 +542,7 @@ const I18N = {
       }
     ],
     lessons: [
-      { w: "to", meaning: "para / a (destino)", tl: ["Origem", "to", "Destino"], rule: "Indica movimento ou direção para um lugar ou pessoa.", ex: [["I walk to school.", "Destino."], ["She moved to Canada.", "País."], ["Talk to me.", "Direção."]], tip: "Não use 'to' com 'home': 'go home'." },
+      { w: "to", meaning: "para / a (destino)", tl: ["Origem", "to", "Destino"], rule: "Indica movimento ou direção para um lugar ou pessoa.", ex: [["I walk to school.", "Destino."], ["She moved to Canada.", "País."], ["Talk to me.", "Direção."]], tip: "'To' + Lugar/Pessoa = Preposição (go to school). 'To' + Verbo = Infinitivo/Ação (want to learn). Nota: não use 'to' com 'home' ('go home')." },
       { w: "at", meaning: "às (hora) / em (ponto exato)", tl: ["Ponto Exato", "at"], rule: "Para horários precisos no relógio e locais específicos.", ex: [["The class begins at 9:00 AM.", "Hora."], ["I sleep at night.", "Expressão."], ["Meet me at the bus station.", "Local."]], tip: "'at night', 'at noon'." },
       { w: "on", meaning: "em / no (dias e superfícies)", tl: ["Dia Específico", "on"], rule: "Para dias da semana, datas com dia e superfícies.", ex: [["Class on Monday.", "Dia."], ["Birthday on March 15th.", "Data."], ["Book on the desk.", "Mesa."]], tip: "'on Friday morning'." },
       { w: "in", meaning: "em (meses, anos, espaços)", tl: ["Período Amplo", "in"], rule: "Para meses, anos, estações e dentro de ambientes.", ex: [["Born in 1998.", "Ano."], ["Snow in January.", "Mês."], ["In the library.", "Lugar."]], tip: "'in the morning'." },
@@ -635,7 +635,7 @@ const I18N = {
       }
     ],
     lessons: [
-      { w: "to", meaning: "~로, ~에게 (목적지/이동)", tl: ["출발지", "to", "목적지"], rule: "사람, 장소, 목표를 향한 이동이나 방향을 나타냅니다.", ex: [["I walk to school.", "목적지."], ["She moved to Canada.", "국가."], ["Talk to me.", "사람."]], tip: "home 앞에는 to를 쓰지 않습니다: 'go home'." },
+      { w: "to", meaning: "~로, ~에게 (목적지/이동)", tl: ["출발지", "to", "목적지"], rule: "사람, 장소, 목표를 향한 이동이나 방향을 나타냅니다.", ex: [["I walk to school.", "목적지."], ["She moved to Canada.", "국가."], ["Talk to me.", "사람."]], tip: "'To' + 장소/사람 = 전치사 (go to school). 'To' + 동사 = 부정사/동작 (want to learn). 주의: home 앞에는 to를 쓰지 않습니다 ('go home')." },
       { w: "at", meaning: "~에 (정확한 시각/지점)", tl: ["정확한 점", "at"], rule: "시계 시각, 특정 장소에 사용합니다.", ex: [["Class at 9:00 AM.", "시각."], ["Sleep at night.", "관용구."], ["At the bus station.", "장소."]], tip: "'at night', 'at noon'." },
       { w: "on", meaning: "~에 (요일/날짜/표면)", tl: ["특정한 날", "on"], rule: "요일, 날짜, 접촉 표면에 사용합니다.", ex: [["On Monday.", "요일."], ["On March 15th.", "날짜."], ["On the desk.", "표면."]], tip: "'on Friday morning'." },
       { w: "in", meaning: "~에 (월/연도/내부)", tl: ["넓은 기간", "in"], rule: "월, 연도, 계절, 내부 공간에 사용합니다.", ex: [["In 1998.", "연도."], ["In January.", "월."], ["In the library.", "내부."]], tip: "'in the morning'." },
@@ -728,7 +728,7 @@ const I18N = {
       }
     ],
     lessons: [
-      { w: "to", meaning: "到… / 向… (目的地)", tl: ["起点", "to", "目的地"], rule: "表示朝向地点、人物或目标的位移或方向。", ex: [["Walk to school.", "目的地。"], ["Moved to Canada.", "国家。"], ["Talk to me.", "人物。"]], tip: "home 前不加 to：'go home'。" },
+      { w: "to", meaning: "到… / 向… (目的地)", tl: ["起点", "to", "目的地"], rule: "表示朝向地点、人物或目标的位移或方向。", ex: [["Walk to school.", "目的地。"], ["Moved to Canada.", "国家。"], ["Talk to me.", "人物。"]], tip: "'To' + 地点/人 = 介词 (go to school)；'To' + 动词 = 不定式/动作 (want to learn)。注意：home 前不加 to ('go home')。" },
       { w: "at", meaning: "在…点 (钟点/具体点)", tl: ["精准点", "at"], rule: "用于钟点时刻与精准地点。", ex: [["Class at 9:00 AM.", "时刻。"], ["Sleep at night.", "固定短语。"], ["At the bus station.", "地点。"]], tip: "'at night', 'at noon'。" },
       { w: "on", meaning: "在…天 (星期/日期/表面)", tl: ["具体某天", "on"], rule: "用于星期几、具体日期与表面。", ex: [["On Monday.", "星期。"], ["On March 15th.", "日期。"], ["On the desk.", "表面。"]], tip: "'on Friday morning'。" },
       { w: "in", meaning: "在…内 (月/年/空间)", tl: ["宽泛周期", "in"], rule: "用于月份、年份、季节及封闭空间内部。", ex: [["In 1998.", "年份。"], ["In January.", "月份。"], ["In the library.", "内部。"]], tip: "'in the morning'。" },
@@ -821,7 +821,7 @@ const I18N = {
       }
     ],
     lessons: [
-      { w: "to", meaning: "〜へ、〜に (目的地・移動)", tl: ["出発地", "to", "目的地"], rule: "場所、人、目標への移動や方向を示します。", ex: [["Walk to school.", "目的地。"], ["Moved to Canada.", "国。"], ["Talk to me.", "人。"]], tip: "home には to を付けません：'go home'。" },
+      { w: "to", meaning: "〜へ、〜に (目的地・移動)", tl: ["出発地", "to", "目的地"], rule: "場所、人、目標への移動や方向を示します。", ex: [["Walk to school.", "目的地。"], ["Moved to Canada.", "国。"], ["Talk to me.", "人。"]], tip: "'To' ＋ 場所/人 ＝ 前置詞 (go to school)。'To' ＋ 動詞 ＝ 不定詞/動作 (want to learn)。注意：home には to を付けません ('go home')。" },
       { w: "at", meaning: "〜時に / 〜の場所で", tl: ["ピンポイント", "at"], rule: "時計の時刻、特定の地点に使います。", ex: [["Class at 9:00 AM.", "時刻。"], ["Sleep at night.", "決まり文句。"], ["At the bus station.", "場所。"]], tip: "'at night', 'at noon'。" },
       { w: "on", meaning: "〜曜日に / 〜の上に", tl: ["特定の日", "on"], rule: "曜日、日付、表面に使います。", ex: [["On Monday.", "曜日。"], ["On March 15th.", "日付。"], ["On the desk.", "表面。"]], tip: "'on Friday morning'。" },
       { w: "in", meaning: "〜月に / 〜年の中に", tl: ["広い期間", "in"], rule: "月、年、季節、空間の内部に使います。", ex: [["In 1998.", "年。"], ["In January.", "月。"], ["In the library.", "内部。"]], tip: "'in the morning'。" },
@@ -914,7 +914,7 @@ const I18N = {
       }
     ],
     lessons: [
-      { w: "to", meaning: "~ലേക്ക്, ~യ്ക്ക് (ലക്ഷ്യസ്ഥാനം)", tl: ["തുടക്കം", "to", "ലക്ഷ്യം"], rule: "ഒരു സ്ഥലത്തേക്കോ വ്യക്തിയിലേക്കോ ഉള്ള ചലനം കാണിക്കുന്നു.", ex: [["Walk to school.", "സ്കൂളിലേക്ക്."], ["Moved to Canada.", "കാനഡയിലേക്ക്."], ["Talk to me.", "എന്നോട്."]], tip: "'home'നൊപ്പം to ഉപയോഗിക്കരുത്: 'go home'." },
+      { w: "to", meaning: "~ലേക്ക്, ~യ്ക്ക് (ലക്ഷ്യസ്ഥാനം)", tl: ["തുടക്കം", "to", "ലക്ഷ്യം"], rule: "ഒരു സ്ഥലത്തേക്കോ വ്യക്തിയിലേക്കോ ഉള്ള ചലനം കാണിക്കുന്നു.", ex: [["Walk to school.", "സ്കൂളിലേക്ക്."], ["Moved to Canada.", "കാനഡയിലേക്ക്."], ["Talk to me.", "എന്നോട്."]], tip: "'To' + സ്ഥലം/വ്യക്തി = പ്രെപോസിഷൻ (go to school). 'To' + ക്രിയ = ഇൻഫിനിറ്റീവ് (want to learn). ഓർക്കുക: 'home'നൊപ്പം to ഉപയോഗിക്കരുത് ('go home')." },
       { w: "at", meaning: "കൃത്യ സമയത്ത് / സ്ഥലത്ത്", tl: ["കൃത്യ ബിന്ദു", "at"], rule: "ക്ലോക്കിലെ സമയം, കൃത്യമായ സ്ഥലം എന്നിവയ്ക്ക്.", ex: [["At 9:00 AM.", "സമയം."], ["At night.", "രാത്രി."], ["At the bus station.", "സ്ഥലം."]], tip: "'at night', 'at noon'." },
       { w: "on", meaning: "ദിവസങ്ങളിൽ / മേൽ", tl: ["നിശ്ചിത ദിവസം", "on"], rule: "ആഴ്ചയിലെ ദിവസങ്ങൾ, തീയതികൾ, ഉപരിതലം എന്നിവയ്ക്ക്.", ex: [["On Monday.", "തിങ്കൾ."], ["On March 15th.", "തീയതി."], ["On the desk.", "മേശപ്പുറത്ത്."]], tip: "'on Friday morning'." },
       { w: "in", meaning: "മാസത്തിൽ / വർഷത്തിൽ / ഉള്ളിൽ", tl: ["വിശാല കാലം", "in"], rule: "മാസം, വർഷം, അടഞ്ഞ മുറികൾ എന്നിവയ്ക്ക്.", ex: [["In 1998.", "വർഷം."], ["In January.", "മാസം."], ["In the library.", "കെട്ടിടം."]], tip: "'in the morning'." },
