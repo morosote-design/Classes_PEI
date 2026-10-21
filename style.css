@@ -185,3 +185,18 @@ button.alt{background:transparent;color:var(--teal);border:2px solid var(--teal)
 }
 .exam-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
 .exam-header h3{margin:0;font-size:1.35rem}
+
+/* TRANSLATION TEXT IN BLUE */
+.tr-blue{
+  display:block;
+  margin-top:6px;
+  color:#0369a1;
+  font-weight:700;
+  font-size:.95rem;
+  letter-spacing:.01em;
+}
+@media(prefers-color-scheme:dark){
+  .tr-blue{
+    color:#38bdf8;
+  }
+}

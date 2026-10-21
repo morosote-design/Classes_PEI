@@ -1,3 +1,114 @@
+const WARMUP_TRANSLATIONS = {
+  "0": {
+    "en": "(I walk to school every morning.)",
+    "es": "(Camino a la escuela todas las mañanas.)",
+    "pt-BR": "(Eu caminho para a escola todas as manhãs.)",
+    "ko": "(나는 매일 아침 학교로 걸어갑니다.)",
+    "zh": "(我每天早晨步行去上学。)",
+    "ja": "(私は毎朝歩いて学校に行きます。)",
+    "ml": "(ഞാൻ എല്ലാ ദിവസവും രാവിലെ നടന്ന് സ്കൂളിൽ പോകുന്നു.)"
+  },
+  "1": {
+    "en": "(Our English class starts at 9:00 AM.)",
+    "es": "(Nuestra clase de inglés empieza a las 9:00 AM.)",
+    "pt-BR": "(Nossa aula de inglês começa às 9:00.)",
+    "ko": "(우리 영어 수업은 오전 9시에 시작합니다.)",
+    "zh": "(我们的英语课在上午9:00开始。)",
+    "ja": "(私たちの英語の授業は午前9時に始まります。)",
+    "ml": "(ഞങ്ങളുടെ ഇംഗ്ലീഷ് ക്ലാസ് രാവിലെ 9:00 മണിക്ക് ആരംഭിക്കുന്നു.)"
+  },
+  "2": {
+    "en": "(I was born in Canada in 1999.)",
+    "es": "(Nací en Canadá en 1999.)",
+    "pt-BR": "(Eu nasci no Canadá em 1999.)",
+    "ko": "(나는 1999년에 캐나다에서 태어났습니다.)",
+    "zh": "(我于1999年出生在加拿大。)",
+    "ja": "(私は1999年にカナダで生まれました。)",
+    "ml": "(ഞാൻ 1999-ൽ കാനഡയിലാണ് ജനിച്ചത്.)"
+  },
+  "3": {
+    "en": "(We have an important quiz on Friday morning.)",
+    "es": "(Tenemos un examen importante el viernes por la mañana.)",
+    "pt-BR": "(Temos uma prova importante na sexta-feira de manhã.)",
+    "ko": "(우리는 금요일 오전에 중요한 퀴즈가 있습니다.)",
+    "zh": "(我们周五上午有一场重要测验。)",
+    "ja": "(金曜日の午전에重要な小テストがあります。)",
+    "ml": "(വെള്ളിയാഴ്ച രാവിലെ ഞങ്ങൾക്ക് ഒരു പ്രധാന പരീക്ഷയുണ്ട്.)"
+  },
+  "4": {
+    "en": "(She lived in Charlottetown for three years.)",
+    "es": "(Ella vivió en Charlottetown durante tres años.)",
+    "pt-BR": "(Ela morou em Charlottetown por três anos.)",
+    "ko": "(그녀는 샬럿타운에서 3년 동안 살았습니다.)",
+    "zh": "(她在夏洛特敦住了三年。)",
+    "ja": "(彼女はシャーロットタウンに3年間住んでいました。)",
+    "ml": "(അവൾ മൂന്ന് വർഷം ഷാർലറ്റ്‌ടൗണിൽ താമസിച്ചു.)"
+  },
+  "5": {
+    "en": "(Brush your teeth before going to sleep.)",
+    "es": "(Lávate los dientes antes de irte a dormir.)",
+    "pt-BR": "(Escove os dentes antes de ir dormir.)",
+    "ko": "(잠자리에 들기 전에 이를 닦으세요.)",
+    "zh": "(睡觉前要刷牙。)",
+    "ja": "(寝る前に歯を磨きなさい。)",
+    "ml": "(ഉറങ്ങാൻ പോകുന്നതിന് മുമ്പ് പല്ല് തേക്കുക.)"
+  },
+  "6": {
+    "en": "(Please turn off your cellphones during the presentation.)",
+    "es": "(Por favor apaguen sus celulares durante la presentación.)",
+    "pt-BR": "(Por favor, desliguem seus celulares durante a apresentação.)",
+    "ko": "(발표 중에는 휴대전화를 꺼주시기 바랍니다.)",
+    "zh": "(演示演讲期间请关掉手机。)",
+    "ja": "(プレゼンテーション中は携帯電話の電源をお切りください。)",
+    "ml": "(പ്രസന്റേഷൻ സമയത്ത് ദയവായി മൊബൈൽ ഫോണുകൾ ഓഫ് ചെയ്യുക.)"
+  },
+  "7": {
+    "en": "(The phone rang while I was making dinner.)",
+    "es": "(Sonó el teléfono mientras preparaba la cena.)",
+    "pt-BR": "(O telefone tocou enquanto eu preparava o jantar.)",
+    "ko": "(내가 저녁을 준비하고 있을 때 전화벨이 울렸습니다.)",
+    "zh": "(我正在做晚饭的时候电话响了。)",
+    "ja": "(夕食を作っている最中に電話が鳴りました。)",
+    "ml": "(ഞാൻ അത്താഴം ഉണ്ടാക്കിക്കൊണ്ടിരുന്നപ്പോൾ ഫോൺ അടിച്ചു.)"
+  },
+  "8": {
+    "en": "(I have known my classmate since last September.)",
+    "es": "(Conozco a mi compañero de clase desde septiembre pasado.)",
+    "pt-BR": "(Conheço meu colega de classe desde setembro passado.)",
+    "ko": "(나는 작년 9월부터 내 반 친구를 알고 지냈습니다.)",
+    "zh": "(自去年九月起我就认识我的同班同学了。)",
+    "ja": "(去年の9月からクラスメイトと知り合いです。)",
+    "ml": "(കഴിഞ്ഞ സെപ്റ്റംബർ മുതൽ എനിക്ക് എന്റെ സഹപാഠിയെ അറിയാം.)"
+  },
+  "9": {
+    "en": "(The library remains open until 10:00 PM tonight.)",
+    "es": "(La biblioteca permanece abierta hasta las 10:00 PM esta noche.)",
+    "pt-BR": "(A biblioteca permanece aberta até às 22h esta noite.)",
+    "ko": "(도서관은 오늘 밤 10시까지 계속 열려 있습니다.)",
+    "zh": "(图书馆今晚一直营业到晚上10:00。)",
+    "ja": "(図書館は今夜10時まで開いています。)",
+    "ml": "(ലൈബ്രറി ഇന്ന് രാത്രി 10:00 മണി വരെ തുറന്നിരിക്കും.)"
+  },
+  "10": {
+    "en": "(We drove to the supermarket to buy groceries.)",
+    "es": "(Fuimos en auto al supermercado a comprar comida/víveres.)",
+    "pt-BR": "(Fomos de carro ao supermercado para fazer compras.)",
+    "ko": "(우리는 장을 보러 슈퍼마켓으로 운전해 갔습니다.)",
+    "zh": "(我们开车去超市买日常杂货。)",
+    "ja": "(私たちは食料品を買うためにスーパーへ車で行きました。)",
+    "ml": "(സാധനങ്ങൾ വാങ്ങാൻ ഞങ്ങൾ സൂപ്പർമാർക്കറ്റിലേക്ക് വണ്ടി ഓടിച്ചുപോയി.)"
+  },
+  "11": {
+    "en": "(After finishing the homework, we relaxed and watched a movie.)",
+    "es": "(Después de terminar la tarea, nos relajamos y vimos una película.)",
+    "pt-BR": "(Depois de terminar a lição de casa, relaxamos e assistimos a um filme.)",
+    "ko": "(숙제를 끝마친 후에 우리는 휴식을 취하며 영화를 보았습니다.)",
+    "zh": "(完成作业后，我们放松下来看了一部电影。)",
+    "ja": "(宿題を終えた後、私たちはくつろいで映画を見ました。)",
+    "ml": "(ഹോംവർക്ക് പൂർത്തിയാക്കിയ ശേഷം ഞങ്ങൾ വിശ്രമിക്കുകയും ഒരു സിനിമ കാണുകയും ചെയ്തു.)"
+  }
+};
+
 /**
  * app.js
  * Logic for Multilingual Prepositions Review & Training.
@@ -1089,9 +1200,14 @@ function checkPracticeItem(index, selectedVal) {
   const langRules = RULE_EXPLANATIONS[CURRENT_LANG] || RULE_EXPLANATIONS["en"];
   const explanation = langRules[item.rule] || RULE_EXPLANATIONS["en"][item.rule] || "";
 
+  // Get sentence translation in CURRENT LANGUAGE
+  const trMap = (typeof WARMUP_TRANSLATIONS !== "undefined") ? WARMUP_TRANSLATIONS[index] : null;
+  const sentenceTr = (trMap && (trMap[CURRENT_LANG] || trMap["en"])) || "";
+  const blueHtml = sentenceTr ? `<span class="tr-blue">${sentenceTr}</span>` : "";
+
   if (selectedVal === item.a) {
     li.className = "practice-ok"; // GREEN
-    fb.innerHTML = ui.correctPrefix + explanation;
+    fb.innerHTML = ui.correctPrefix + explanation + blueHtml;
   } else {
     li.className = "practice-wrong"; // ORANGE
     fb.innerHTML = ui.wrongMarked(selectedVal) + ui.answerLabel + `<b>${item.a}</b>. ` + explanation;
